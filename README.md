@@ -1,1 +1,1 @@
-# MindShifters
+# MindShifters-Ideathon
