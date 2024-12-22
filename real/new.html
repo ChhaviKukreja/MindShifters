@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="d.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Dash Board</h2>
+    <ul>
+      <li class="active"><span>🏠</span> Dashboard</li>
+      <li><span>📅</span> Events</li>
+      <li><span>📩</span> Event Requests</li>
+      <li><span>📆</span> Calendars</li>
+      <li><span>📊</span> Reports</li>
+      <li><span>⚙</span> Settings</li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <header>
+      <h1>Dash Board</h1>
+      <div class="header-buttons">
+        <button class="btn btn-primary" onclick="window.location.href='add-event.html';">+ Quick Event Create</button>
+        <button class="btn btn-secondary" onclick="window.location.href='add-event.html';">+ Add Event</button>
+      </div>
+    </header>
+
+    <!-- Cards Section -->
+    <div class="cards">
+        <div class="card" onclick="window.location.href='add-event.html';" style="cursor: pointer;">
+            <span>➕</span>
+            <h3>Add Event</h3>
+          </div>          
+      
+      <div class="card">
+        <span>📝</span>
+        <h3>Work Order Portal</h3>
+      </div>
+      <div class="card">
+        <span>📆</span>
+        <h3>Current Events</h3>
+      </div>
+      <div class="card">
+        <span>📜</span>
+        <h3>Past Events</h3>
+      </div>
+    </div>
+
+    <!-- Tables Section -->
+    <div class="table-section">
+      <h2>Request Administrative Approval</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>SL</th>
+            <th>Event ID</th>
+            <th>Event</th>
+            <th>Location</th>
+            <th>Date & Time</th>
+            <th>Created By</th>
+            <th>Created On</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>01</td>
+            <td>#AB0225</td>
+            <td>Event Name One</td>
+            <td>45/A NYC, USA</td>
+            <td>12 Jan 2018 22:34 AM</td>
+            <td>Carrie G. Adkins</td>
+            <td>21 July 2018</td>
+            <td>✏</td>
+          </tr>
+          <!-- Add more rows as needed -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Sidebar toggle functionality
+        const sidebarToggle = document.querySelector("#sidebar-toggle");
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener("click", toggleSidebar);
+        }
+
+        checkAuth();
+    });
+
+    async function checkAuth() {
+        try {
+            const token = localStorage.getItem("authToken");
+            if (!token) throw new Error("No token found");
+
+            const response = await fetch("/auth/check", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status !== 200) {
+                throw new Error("Authentication failed");
+            }
+        } catch (err) {
+            alert("You are not logged in. Redirecting to login page.");
+            window.location.href = "/signin";
+        }
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('hidden');
+    }
+</script>
+
+</body>
+</html>

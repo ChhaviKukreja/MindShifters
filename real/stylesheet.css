@@ -1,0 +1,128 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url('https://images.unsplash.com/photo-1522098543979-ffc7f79e2d06');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Ensure the container maintains a 16:9 aspect ratio */
+.container {
+    width: 100vw; /* Full viewport width */
+    height: calc(100vw * 9 / 16); /* Height based on 16:9 ratio */
+    max-width: 1600px; /* Limit maximum width */
+    max-height: calc(1600px * 9 / 16); /* Limit maximum height */
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.header h1 {
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 30px;
+    font-size: 2.5em; /* Header font size */
+}
+
+.event-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-size: 1.3em;
+    margin-bottom: 5px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.form-group i {
+    margin-right: 10px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.2em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #333;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.submit-btn {
+    padding: 15px;
+    background-color: #28a745;
+    color: white;
+    font-size: 1.4em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.submit-btn i {
+    margin-right: 10px;
+}
+
+.submit-btn:hover {
+    background-color: #218838;
+    box-shadow: 0 8px 15px rgba(0, 123, 255, 0.3);
+}
+
+.submit-btn:focus {
+    outline: none;
+}
+
+/* Ensuring responsiveness for smaller viewports */
+@media (max-width: 800px) {
+    .container {
+        width: 100vw;
+        height: auto;
+        max-width: 100%;
+        padding: 20px;
+    }
+
+    .header h1 {
+        font-size: 2em;
+    }
+
+    .form-group input {
+        padding: 10px;
+        font-size: 1.1em;
+    }
+
+    .submit-btn {
+        padding: 12px;
+        font-size: 1.2em;
+    }
+}

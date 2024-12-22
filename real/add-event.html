@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Event</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="stylesheet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="background">
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-calendar-plus"></i> Add Event</h1>
+            </div>
+            <form action="#" method="post" class="event-form">
+                <div class="form-group">
+                    <label for="event-name"><i class="fas fa-edit"></i> Event Name:</label>
+                    <input type="text" id="event-name" name="event-name" placeholder="Enter event name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="date"><i class="fas fa-calendar-alt"></i> Date:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="time"><i class="fas fa-clock"></i> Time:</label>
+                    <input type="time" id="time" name="time" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="location"><i class="fas fa-map-marker-alt"></i> Location:</label>
+                    <input type="text" id="location" name="location" placeholder="Enter location" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="student-coordinator"><i class="fas fa-user-graduate"></i> Student Coordinator:</label>
+                    <input type="text" id="student-coordinator" name="student-coordinator" placeholder="Enter student coordinator's name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="staff-coordinator"><i class="fas fa-chalkboard-teacher"></i> Staff Coordinator:</label>
+                    <input type="text" id="staff-coordinator" name="staff-coordinator" placeholder="Enter staff coordinator's name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-price"><i class="fas fa-dollar-sign"></i> Event Price:</label>
+                    <input type="number" id="event-price" name="event-price" placeholder="Enter event price" required>
+                </div>
+
+                <button type="submit" class="submit-btn"><i class="fas fa-check-circle"></i> Submit</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // add-event.js
+const API_URL = "http://localhost:3000/organiser"; // Replace with your server's URL
+const token = localStorage.getItem("token");
+
+// Redirect to sign-in if no token is found
+if (!token) {
+  alert("Please sign in to add an event.");
+  window.location.href = "signin.html";
+}
+
+// Handle form submission
+document.querySelector(".event-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = {    
+    event: document.querySelector("#event-name").value,
+    date: document.querySelector("#date").value,
+    time: document.querySelector("#time").value,
+    location: document.querySelector("#location").value,
+    stuCoord: [
+      {
+        name: document.querySelector("#student-coordinator").value,
+        number: "1234567890", // Replace this with actual input if available
+        email: "example@example.com", // Replace this with actual input if available
+      },
+    ],
+    imageLink: "https://via.placeholder.com/150", // Replace with actual input
+    description: "Event Description", // Replace with actual input
+    regLink: "https://example.com/register", // Replace with actual input
+    SL: Math.floor(Math.random() * 1000), // Generate random SL
+  };
+
+  try {
+    const response = await fetch(`${API_URL}/eventReg`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) throw new Error("Failed to add event");
+
+    alert("Event added successfully!");
+    window.location.href = "new.html"; // Redirect to dashboard
+  } catch (err) {
+    console.error(err);
+    alert("Error adding event.");
+  }
+});
+
+    </script>
+</body>
+</html>
