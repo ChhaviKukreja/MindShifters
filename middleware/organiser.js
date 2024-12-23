@@ -1,16 +1,16 @@
-const { Participant }=require("./db/index");
+const { Organiser }=require("../db");
 const jwt=require("jsonwebtoken");
-const {JWT_SECRET}=require("../../config");
- 
-function participantMiddleware(req,res,next){
+const { JWT_SECRET }=require("../config");
+
+function organiserMiddleware(req,res,next){
     try{
         const token=req.headers.authorization;
         const words=token.split(" ");
         const jwtToken=words[1];
 
         const decodedValue= jwt.verify(jwtToken,JWT_SECRET);
-        if(decodedValue.username){
-            req.username=decodedValue.username;
+        if (decodedValue.username) {
+            req.username = decodedValue.username; // Set username in request object
             next();
         }
         else{
@@ -22,6 +22,6 @@ function participantMiddleware(req,res,next){
         res.json({
             msg:"Incorrect inputs"
         })
-    }
+    }  
 }
-module.exports=participantMiddleware;
+module.exports=organiserMiddleware;

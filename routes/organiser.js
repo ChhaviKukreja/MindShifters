@@ -1,11 +1,11 @@
 // Updated organiser.js with Zod validation, improved functionality, and dedicated to-do list management
 const cors = require("cors");
 const express = require("express");
-const organiserMiddleware = require("./organiser");
+const organiserMiddleware = require("../middleware/organiser");
 const router = express.Router();
-const { Organiser, Events } = require("./indexdb");
+const { Organiser, Events } = require("../db");
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("./config");
+const { JWT_SECRET } = require("../config");
 const { z } = require("zod");
 router.use(cors());
 
