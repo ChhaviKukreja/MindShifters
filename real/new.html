@@ -9,13 +9,12 @@
 <body>
   <!-- Sidebar -->
   <div class="sidebar">
-    <h2>Dash Board</h2>
+    <h2>Dashboard</h2>
     <ul>
-      <li class="active"><span>🏠</span> Dashboard</li>
-      <li><span>📅</span> Events</li>
-      <li><span>📩</span> Event Requests</li>
+      <li class="active"><span>🏠</span> Home</li>
+      <li onclick="window.location.href='events.html';"><span>📅</span> Events</li>
+      <li><span>📩</span> Manage Participants</li>
       <li><span>📆</span> Calendars</li>
-      <li><span>📊</span> Reports</li>
       <li><span>⚙</span> Settings</li>
     </ul>
   </div>
@@ -24,23 +23,22 @@
   <div class="main-content">
     <!-- Header -->
     <header>
-      <h1>Dash Board</h1>
+      <h1>Organiser</h1>
       <div class="header-buttons">
-        <button class="btn btn-primary" onclick="window.location.href='add-event.html';">+ Quick Event Create</button>
-        <button class="btn btn-secondary" onclick="window.location.href='add-event.html';">+ Add Event</button>
+        <button class="btn btn-primary" onclick="window.location.href='about.html';">About Us</button>
+        <button class="btn btn-secondary" onclick="logout();">Log out</button>
       </div>
     </header>
 
     <!-- Cards Section -->
     <div class="cards">
-        <div class="card" onclick="window.location.href='add-event.html';" style="cursor: pointer;">
-            <span>➕</span>
-            <h3>Add Event</h3>
-          </div>          
-      
+      <div class="card" onclick="window.location.href='add-event.html';" style="cursor: pointer;">
+        <span>📅</span>
+        <h3>Add Event</h3>
+      </div>
       <div class="card">
         <span>📝</span>
-        <h3>Work Order Portal</h3>
+        <h3>To-do List</h3>
       </div>
       <div class="card">
         <span>📆</span>
@@ -58,69 +56,107 @@
       <table>
         <thead>
           <tr>
-            <th>SL</th>
-            <th>Event ID</th>
+            <th>#</th>
             <th>Event</th>
             <th>Location</th>
-            <th>Date & Time</th>
-            <th>Created By</th>
-            <th>Created On</th>
-            <th>Edit</th>
+            <th>Date</th>
+            <th>Student Coordinator</th>
+            <th>Staff Coordinator</th>
+            <th>Price</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>01</td>
-            <td>#AB0225</td>
-            <td>Event Name One</td>
-            <td>45/A NYC, USA</td>
-            <td>12 Jan 2018 22:34 AM</td>
-            <td>Carrie G. Adkins</td>
-            <td>21 July 2018</td>
-            <td>✏</td>
-          </tr>
-          <!-- Add more rows as needed -->
+        <tbody id="event-table-body">
         </tbody>
       </table>
     </div>
   </div>
 
   <script>
+    // Ensure DOM is fully loaded
     document.addEventListener("DOMContentLoaded", () => {
-        // Sidebar toggle functionality
-        const sidebarToggle = document.querySelector("#sidebar-toggle");
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener("click", toggleSidebar);
-        }
-
-        checkAuth();
+      checkAuth();
+      fetchAndDisplayEvents();
     });
 
+    // Check Authentication
     async function checkAuth() {
-        try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No token found");
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) throw new Error("No token found");
 
-            const response = await fetch("/auth/check", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+        const response = await fetch("http://localhost:3000/organiser/auth/check", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-            if (response.status !== 200) {
-                throw new Error("Authentication failed");
-            }
-        } catch (err) {
-            alert("You are not logged in. Redirecting to login page.");
-            window.location.href = "/signin";
+        if (!response.ok) {
+          throw new Error("Authentication failed");
         }
+      } catch (err) {
+        alert("You are not logged in. Redirecting to login page.");
+        window.location.href = "sign-in.html";
+      }
     }
 
+    // Fetch and display events in the table
+    async function fetchAndDisplayEvents() {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch("http://localhost:3000/organiser/orgEvents", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch event data");
+        }
+
+        const events = await response.json();
+        const tableBody = document.getElementById("event-table-body");
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        if (events.length === 0 || events.events.length == 0) {
+          tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">No events found</td></tr>`;
+          return;
+        }
+        const eventArray = events;
+        console.log(events);
+        events.events.forEach((event, index, eventArray) => {
+          const row = `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${event.event}</td>
+              <td>${event.location}</td>
+              <td>${new Date(event.date).toLocaleDateString()}</td>
+              <td>${event.stuCoord}</td>
+              <td>${event.staffCoordinator}</td>
+              <td>${event.price}</td>
+            </tr>
+          `;
+          tableBody.insertAdjacentHTML("beforeend", row);
+        });
+      } catch (error) {
+        console.error("Error loading events:", error);
+        alert("Failed to load events. Please try again later.");
+      }
+    }
+
+    // Log out function
+    function logout() {
+      localStorage.removeItem("authToken");
+      alert("You have been logged out.");
+      window.location.href = "sign-in.html";
+    }
+
+    // Sidebar toggle functionality
     function toggleSidebar() {
-        const sidebar = document.querySelector('.sidebar');
-        sidebar.classList.toggle('hidden');
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('hidden');
     }
-</script>
-
+  </script>
 </body>
 </html>

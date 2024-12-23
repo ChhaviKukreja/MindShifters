@@ -14,7 +14,7 @@
             <div class="header">
                 <h1><i class="fas fa-calendar-plus"></i> Add Event</h1>
             </div>
-            <form action="#" method="post" class="event-form">
+            <form id="eventForm" class="event-form">
                 <div class="form-group">
                     <label for="event-name"><i class="fas fa-edit"></i> Event Name:</label>
                     <input type="text" id="event-name" name="event-name" placeholder="Enter event name" required>
@@ -25,10 +25,10 @@
                     <input type="date" id="date" name="date" required>
                 </div>
 
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="time"><i class="fas fa-clock"></i> Time:</label>
                     <input type="time" id="time" name="time" required>
-                </div>
+                </div> -->
 
                 <div class="form-group">
                     <label for="location"><i class="fas fa-map-marker-alt"></i> Location:</label>
@@ -55,58 +55,68 @@
         </div>
     </div>
     <script>
-        // add-event.js
-const API_URL = "http://localhost:3000/organiser"; // Replace with your server's URL
-const token = localStorage.getItem("token");
+        //const API_URL = "http://localhost:3000/organiser/eventReg"; // Replace with your server's URL
+        const token = localStorage.getItem("authToken");
 
-// Redirect to sign-in if no token is found
-if (!token) {
-  alert("Please sign in to add an event.");
-  window.location.href = "signin.html";
-}
+        console.log("Token is: " + token);
 
-// Handle form submission
-document.querySelector(".event-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
+        // Redirect to sign-in if no token is found
+        if (!token) {
+            alert("Please sign in to add an event.");
+            window.location.href = "signin.html";
+        }
 
-  const formData = {    
-    event: document.querySelector("#event-name").value,
-    date: document.querySelector("#date").value,
-    time: document.querySelector("#time").value,
-    location: document.querySelector("#location").value,
-    stuCoord: [
-      {
-        name: document.querySelector("#student-coordinator").value,
-        number: "1234567890", // Replace this with actual input if available
-        email: "example@example.com", // Replace this with actual input if available
-      },
-    ],
-    imageLink: "https://via.placeholder.com/150", // Replace with actual input
-    description: "Event Description", // Replace with actual input
-    regLink: "https://example.com/register", // Replace with actual input
-    SL: Math.floor(Math.random() * 1000), // Generate random SL
-  };
+        // Handle form submission
+        document.getElementById("eventForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-  try {
-    const response = await fetch(`${API_URL}/eventReg`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(formData),
-    });
+            // Collect form data dynamically
+            const formData = {
+                event: document.getElementById("event-name").value.trim(),
+                date: document.getElementById("date").value,
+                //time: document.getElementById("time").value,
+                location: document.getElementById("location").value.trim(),
+                stuCoord: document.getElementById("student-coordinator").value.trim(),
+                staffCoordinator: document.getElementById("staff-coordinator").value.trim(),
+                price: parseFloat(document.getElementById("event-price").value),
+            };
 
-    if (!response.ok) throw new Error("Failed to add event");
+            // Client-side validation
+            if (!formData.event || !formData.date || !formData.location || !formData.stuCoord || !formData.staffCoordinator || isNaN(formData.price)) {
+                alert("Please fill in all fields correctly.");
+                return;
+            }
 
-    alert("Event added successfully!");
-    window.location.href = "new.html"; // Redirect to dashboard
-  } catch (err) {
-    console.error(err);
-    alert("Error adding event.");
-  }
-});
+            try {
+                console.log("Before fetch: Sending form data", formData);
 
+                const response = await fetch("http://localhost:3000/organiser/eventReg", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                console.log("After fetch: Response received", response);
+
+                if (!response.ok) {
+                    const errorData = await response.json(); // Parse backend error response
+                    console.error("Server responded with error:", errorData);
+                    throw new Error(errorData.error || "Failed to add event");
+                }
+
+                const result = await response.json();
+                console.log("Event added successfully:", result);
+
+                alert("Event added successfully!");
+                window.location.href = "new.html"; // Redirect to the dashboard
+            } catch (err) {
+                console.error("Error occurred:", err);
+                alert("Error adding event.");
+            }
+        });
     </script>
 </body>
 </html>

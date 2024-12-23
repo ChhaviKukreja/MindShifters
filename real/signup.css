@@ -18,7 +18,7 @@ section {
 .form-box {
     position: relative;
     width: 400px;
-    height: 450px;
+    height: auto;
     background: transparent;
     border: none;
     border-radius: 20px;
@@ -26,6 +26,7 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 20px 0;
 }
 
 h2 {
@@ -36,7 +37,7 @@ h2 {
 
 .inputbox {
     position: relative;
-    margin: 30px 0;
+    margin: 20px 0;
     width: 310px;
     border-bottom: 2px solid #fff;
 }
@@ -59,7 +60,8 @@ input:valid~label {
 }
 
 /* animation:end */
-.inputbox input {
+.inputbox input,
+.inputbox select {
     width: 100%;
     height: 50px;
     background: transparent;
@@ -78,25 +80,28 @@ input:valid~label {
     top: 20px;
 }
 
-.forget {
-    margin: -10px 0 17px;
-    font-size: 0.9em;
-    color: #fff;
+.role-section {
+    margin: 20px 0;
+    width: 310px;
     display: flex;
-    justify-content: space-between;
-}
-
-.forget label input {
-    margin-right: 3px;
-}
-
-.forget a {
+    flex-direction: column;
     color: #fff;
-    text-decoration: none;
 }
 
-.forget a:hover {
-    text-decoration: underline;
+.role-section label {
+    margin-bottom: 5px;
+    font-size: 1em;
+}
+
+.role-section select {
+    height: 40px;
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    font-size: 1em;
+    padding: 5px;
+    outline: none;
+    border-radius: 5px;
 }
 
 button {
@@ -109,6 +114,7 @@ button {
     cursor: pointer;
     font-size: 1em;
     font-weight: 600;
+    margin-top: 10px;
 }
 
 .register {
