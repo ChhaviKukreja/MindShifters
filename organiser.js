@@ -1,6 +1,6 @@
-const { Organiser }=require("../db/index");
+const { Organiser }=require("./indexdb");
 const jwt=require("jsonwebtoken");
-const { JWT_SECRET }=require("../config");
+const { JWT_SECRET }=require("./config");
 
 function organiserMiddleware(req,res,next){
     try{
