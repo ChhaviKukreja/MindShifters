@@ -1,4 +1,4 @@
-const { Organiser }=require("../db");
+const { Organiser }=require("../backend/db");
 const jwt=require("jsonwebtoken");
 const { JWT_SECRET }=require("../config");
 

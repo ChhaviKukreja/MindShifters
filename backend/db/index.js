@@ -1,6 +1,8 @@
+require('dotenv').config();
 const mongoose=require("mongoose");
 
-mongoose.connect('mongodb+srv://admin:goodboy@cluster1.vzqhy.mongodb.net/Ideathon');
+const mongoUri = process.env.MONGO_URI;
+mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const organiserSchema=new mongoose.Schema({
     username:String,
