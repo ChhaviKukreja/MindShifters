@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Organizer To-Do List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f7f9fc;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background-color: #ffffff;
+            border-right: 1px solid #e3e6f0;
+        }
+
+        #taskDetails {
+            border-left: 1px solid #e3e6f0;
+            padding: 20px;
+            background: #f9f9f9;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .task-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+        }
+
+        .task-container h6 {
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .task-container label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .task-container input,
+        .task-container select,
+        .task-container textarea {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+
+        .close-btn button {
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            color: #6c757d;
+            cursor: pointer;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .hidden {
+            display: none
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 sidebar p-4">
+                <h5 class="mb-4">Menu</h5>
+                <input type="text" class="form-control mb-3" placeholder="Search">
+                <h6 class="text-muted">Tasks</h6>
+                <ul class="list-group mb-4">
+                    <li class="list-group-item">Upcoming Deadline</li>
+                    <li class="list-group-item">Completed</li>
+                </ul>
+                <h6 class="text-muted">Events</h6>
+                <ul class="list-group mb-4" id="eventsList">
+                    <li class="list-group-item">Loading...</li>
+                </ul>
+
+                <h6 class="text-muted">Tags</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-primary">High Priority</span>
+                    <span class="badge bg-secondary">Urgent</span>
+                    <button class="btn btn-sm btn-outline-secondary">+ Add Tag</button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-6 p-4">
+                <div class="task-container p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="task-header">Today's Tasks</span>
+                        <button class="btn btn-primary btn-sm">+ Add New Task</button>
+                    </div>
+                    <ul class="list-group" id="taskList">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Decor Finalization
+                            <span class="badge bg-danger">High Priority</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Guest List Confirmation
+                            <span class="badge bg-warning">Medium Priority</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Catering Coordination
+                            <span class="badge bg-primary">Low Priority</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="progress-info mb-4">
+                    <span>Progress</span>
+                    <span id="progressPercentage">50%</span>
+                </div>
+                <div class="progress">
+                    <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 50%;">50%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Details -->
+
+            <div class="task-container p-4" id="taskDetails">
+                <button class="btn btn-sm btn-outline-secondary mb-3 float-end" id="closeDetails">Close</button>
+                <label for="taskName" class="form-label">Task Name</label>
+                <input type="text" id="taskName" class="form-control mb-3" placeholder="Enter Task Name">
+
+                <label for="eventName" class="form-label">Event Name</label>
+                <input type="text" id="eventName" class="form-control mb-3" placeholder="Enter Event Name">
+
+                <label for="prioritySelect" class="form-label">Priority</label>
+                <select id="prioritySelect" class="form-select mb-3">
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+
+                <label for="responsiblePerson" class="form-label">Responsible Person(s)</label>
+                <input type="text" id="responsiblePerson" class="form-control mb-3" placeholder="Enter Name(s)">
+
+                <label for="taskStatus" class="form-label">Status</label>
+                <select id="taskStatus" class="form-select mb-3">
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+
+                <label for="dueDate" class="form-label">Due Date</label>
+                <input type="date" id="dueDate" class="form-control mb-3">
+
+                <label for="tags" class="form-label">Tags</label>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge bg-primary">High Priority</span>
+                    <span class="badge bg-secondary">Urgent</span>
+                    <button class="btn btn-sm btn-outline-secondary">+ Add Tag</button>
+                </div>
+
+                <h6 class="mb-3">Subtasks:</h6>
+                <div class="subtask-container">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" value="" id="subtask1">
+                        <label class="form-check-label" for="subtask1">Book Venue</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" value="" id="subtask2">
+                        <label class="form-check-label" for="subtask2">Finalize Theme</label>
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary mt-2">+ Add New Subtask</button>
+                </div>
+
+                <label for="notes" class="form-label mt-3">Notes</label>
+                <textarea id="notes" class="form-control mb-3" placeholder="Add additional details here"></textarea>
+
+                <div class="mt-4 d-flex justify-content-between">
+                    <button class="btn btn-danger" id="deleteTask">Delete Task</button>
+                    <button class="btn btn-success" id="saveTask">Save Changes</button>
+                </div>
+            </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            fetchAndDisplayEvents();
+            const sidebar = document.getElementById("sidebar");
+            const mainContent = document.getElementById("mainContent");
+            const taskDetails = document.getElementById("taskDetails");
+            const addNewTaskButton = document.getElementById("addNewTask");
+            const closeDetailsButton = document.getElementById("closeDetails");
+
+            // Show task details and slide sidebar on "Add New Task" click
+            addNewTaskButton.addEventListener("click", () => {
+                sidebar.classList.add("active");
+                mainContent.classList.add("sidebar-active");
+                taskDetails.classList.add("task-details-expanded");
+            });
+
+            // Hide task details and slide sidebar back on "Close" click
+            closeDetailsButton.addEventListener("click", () => {
+                sidebar.classList.remove("active");
+                mainContent.classList.remove("sidebar-active");
+                taskDetails.classList.remove("task-details-expanded");
+            });
+
+        });
+
+        async function fetchAndDisplayEvents() {
+            const eventsList = document.getElementById("eventsList");
+            eventsList.innerHTML = "<li class='list-group-item'>Loading events...</li>";
+
+            try {
+                // Replace with your backend URL
+                const response = await fetch("http://localhost:3000/organiser/events", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}` // Add if token is required
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const events = await response.json(); // Assuming your API returns { events: [...] }
+                if (events.length === 0) {
+                    eventsList.innerHTML = "<li class='list-group-item'>No events available.</li>";
+                    return;
+                }
+
+                // Clear the loading message
+                eventsList.innerHTML = "";
+
+                // Dynamically add events to the list
+                events.events.forEach(event => {
+                    const eventItem = `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            ${event.event}
+                            <button class="btn btn-sm btn-outline-info" onclick="fetchTasks('${event.event}')">View Tasks</button>
+                        </li>
+                    `;
+                    eventsList.insertAdjacentHTML("beforeend", eventItem);
+                });
+            } catch (error) {
+                console.error("Error fetching events:", error);
+                eventsList.innerHTML = "<li class='list-group-item text-danger'>Failed to load events.</li>";
+            }
+        }
+
+
+        async function fetchTasks(eventName) {
+            const taskList = document.getElementById("taskList");
+            taskList.innerHTML = "<li class='list-group-item'>Loading tasks...</li>";
+
+            try {
+                // Replace with your backend URL
+                const response = await fetch(`http://localhost:3000/organiser/tasks?event=${eventName}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}` // Add if token is required
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const tasks = await response.json(); // Assuming your API returns { tasks: [...] }
+                if (tasks.length === 0) {
+                    taskList.innerHTML = "<li class='list-group-item'>No tasks available for this event.</li>";
+                    return;
+                }
+
+                // Clear the loading message
+                taskList.innerHTML = "";
+
+                // Dynamically add tasks to the list
+                tasks.tasks.forEach(task => {
+                    const taskItem = `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            ${task.name}
+                            <span class="badge ${getPriorityClass(task.priority)}">${task.priority}</span>
+                        </li>
+                    `;
+                    taskList.insertAdjacentHTML("beforeend", taskItem);
+                });
+            } catch (error) {
+                console.error("Error fetching tasks:", error);
+                taskList.innerHTML = "<li class='list-group-item text-danger'>Failed to load tasks.</li>";
+            }
+        }
+
+        function getPriorityClass(priority) {
+            switch (priority) {
+                case "High":
+                    return "bg-danger";
+                case "Medium":
+                    return "bg-warning";
+                case "Low":
+                    return "bg-primary";
+                default:
+                    return "bg-secondary";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

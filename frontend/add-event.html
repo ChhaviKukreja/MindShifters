@@ -9,114 +9,141 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="background">
-        <div class="container">
-            <div class="header">
-                <h1><i class="fas fa-calendar-plus"></i> Add Event</h1>
-            </div>
-            <form id="eventForm" class="event-form">
-                <div class="form-group">
-                    <label for="event-name"><i class="fas fa-edit"></i> Event Name:</label>
-                    <input type="text" id="event-name" name="event-name" placeholder="Enter event name" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="date"><i class="fas fa-calendar-alt"></i> Date:</label>
-                    <input type="date" id="date" name="date" required>
-                </div>
-
-                <!-- <div class="form-group">
-                    <label for="time"><i class="fas fa-clock"></i> Time:</label>
-                    <input type="time" id="time" name="time" required>
-                </div> -->
-
-                <div class="form-group">
-                    <label for="location"><i class="fas fa-map-marker-alt"></i> Location:</label>
-                    <input type="text" id="location" name="location" placeholder="Enter location" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="student-coordinator"><i class="fas fa-user-graduate"></i> Student Coordinator:</label>
-                    <input type="text" id="student-coordinator" name="student-coordinator" placeholder="Enter student coordinator's name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="staff-coordinator"><i class="fas fa-chalkboard-teacher"></i> Staff Coordinator:</label>
-                    <input type="text" id="staff-coordinator" name="staff-coordinator" placeholder="Enter staff coordinator's name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="event-price"><i class="fas fa-dollar-sign"></i> Event Price:</label>
-                    <input type="number" id="event-price" name="event-price" placeholder="Enter event price" required>
-                </div>
-
-                <button type="submit" class="submit-btn"><i class="fas fa-check-circle"></i> Submit</button>
-            </form>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-calendar-plus"></i> Add Event</h1>
         </div>
+        <form id="eventForm" class="event-form">
+            <div class="form-group">
+                <label for="event-name"><i class="fas fa-edit"></i> Event Name:</label>
+                <input type="text" id="event-name" name="event-name" placeholder="Enter event name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="date"><i class="fas fa-calendar-alt"></i> Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="time"><i class="fas fa-clock"></i> Time:</label>
+                <input type="time" id="time" name="time" required>
+            </div>
+
+            <div class="form-group">
+                <label for="location"><i class="fas fa-map-marker-alt"></i> Location:</label>
+                <input type="text" id="location" name="location" placeholder="Enter location" required>
+            </div>
+
+            <div id="student-coordinators">
+                <label><i class="fas fa-user-graduate"></i> Student Coordinators:</label>
+                <div class="form-group">
+                    <input type="text" class="stu-coord-name" placeholder="Student coordinator name" required>
+                    <input type="text" class="stu-coord-contact" placeholder="Contact number" required>
+                    <input type="email" class="stu-coord-email" placeholder="Email" required>
+                </div>
+            </div>
+            <button type="button" id="add-stu-coord" class="add-btn"><i class="fas fa-plus-circle"></i> Add Student Coordinator</button>
+
+            <div class="form-group">
+                <label for="description"><i class="fas fa-info-circle"></i> Description:</label>
+                <textarea id="description" name="description" placeholder="Enter a description (optional)"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="imageURL"><i class="fas fa-image"></i> Image URL:</label>
+                <input type="url" id="imageURL" name="imageURL" placeholder="Enter image URL (optional)">
+            </div>
+
+            <button type="submit" class="submit-btn"><i class="fas fa-check-circle"></i> Submit</button>
+        </form>
     </div>
     <script>
-        //const API_URL = "http://localhost:3000/organiser/eventReg"; // Replace with your server's URL
         const token = localStorage.getItem("authToken");
 
-        console.log("Token is: " + token);
+console.log("Token is: " + token);
 
-        // Redirect to sign-in if no token is found
-        if (!token) {
-            alert("Please sign in to add an event.");
-            window.location.href = "signin.html";
+// Redirect to sign-in if no token is found
+if (!token) {
+    alert("Please sign in to add an event.");
+    window.location.href = "signin.html";
+}
+
+// Handle adding multiple student coordinators
+const studentCoordContainer = document.getElementById("student-coordinators");
+const addStuCoordButton = document.getElementById("add-stu-coord");
+
+addStuCoordButton.addEventListener("click", () => {
+    const coordDiv = document.createElement("div");
+    coordDiv.classList.add("form-group");
+    coordDiv.innerHTML = `
+        <input type="text" class="stu-coord-name" placeholder="Student coordinator name" required>
+        <input type="text" class="stu-coord-contact" placeholder="Contact number" required>
+        <input type="email" class="stu-coord-email" placeholder="Email" required>
+    `;
+    studentCoordContainer.appendChild(coordDiv);
+});
+
+// Handle form submission
+document.getElementById("eventForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Collect student coordinators data
+    const studentCoordinators = Array.from(
+        document.querySelectorAll("#student-coordinators .form-group")
+    ).map((group) => ({
+        name: group.querySelector(".stu-coord-name").value.trim(),
+        contact: group.querySelector(".stu-coord-contact").value.trim(),
+        email: group.querySelector(".stu-coord-email").value.trim(),
+    }));
+
+    // Collect form data dynamically
+    const formData = {
+        event: document.getElementById("event-name").value.trim(),
+        date: document.getElementById("date").value,
+        time: document.getElementById("time").value,
+        location: document.getElementById("location").value.trim(),
+        stuCoord: studentCoordinators,
+        description: document.getElementById("description").value.trim(),
+        imageURL: document.getElementById("imageURL").value.trim(),
+    };
+
+    // Client-side validation
+    if (!formData.event || !formData.date || !formData.time || !formData.location || studentCoordinators.length === 0) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    try {
+        console.log("Before fetch: Sending form data", formData);
+
+        const response = await fetch("http://localhost:3000/organiser/eventReg", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(formData),
+        });
+
+        console.log("After fetch: Response received", response);
+
+        if (!response.ok) {
+            const errorData = await response.json(); // Parse backend error response
+            console.error("Server responded with error:", errorData);
+            throw new Error(errorData.error || "Failed to add event");
         }
 
-        // Handle form submission
-        document.getElementById("eventForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
+        const result = await response.json();
+        console.log("Event added successfully:", result);
 
-            // Collect form data dynamically
-            const formData = {
-                event: document.getElementById("event-name").value.trim(),
-                date: document.getElementById("date").value,
-                //time: document.getElementById("time").value,
-                location: document.getElementById("location").value.trim(),
-                stuCoord: document.getElementById("student-coordinator").value.trim(),
-                staffCoordinator: document.getElementById("staff-coordinator").value.trim(),
-                price: parseFloat(document.getElementById("event-price").value),
-            };
+        alert("Event added successfully!");
+        window.location.href = "new.html"; // Redirect to the dashboard
+    } catch (err) {
+        console.error("Error occurred:", err);
+        alert("Error adding event.");
+    }
+       });
 
-            // Client-side validation
-            if (!formData.event || !formData.date || !formData.location || !formData.stuCoord || !formData.staffCoordinator || isNaN(formData.price)) {
-                alert("Please fill in all fields correctly.");
-                return;
-            }
-
-            try {
-                console.log("Before fetch: Sending form data", formData);
-
-                const response = await fetch("http://localhost:3000/organiser/eventReg", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(formData),
-                });
-
-                console.log("After fetch: Response received", response);
-
-                if (!response.ok) {
-                    const errorData = await response.json(); // Parse backend error response
-                    console.error("Server responded with error:", errorData);
-                    throw new Error(errorData.error || "Failed to add event");
-                }
-
-                const result = await response.json();
-                console.log("Event added successfully:", result);
-
-                alert("Event added successfully!");
-                window.location.href = "new.html"; // Redirect to the dashboard
-            } catch (err) {
-                console.error("Error occurred:", err);
-                alert("Error adding event.");
-            }
-        });
     </script>
 </body>
 </html>

@@ -36,11 +36,11 @@
         <span>📅</span>
         <h3>Add Event</h3>
       </div>
-      <div class="card">
+      <div class="card" onclick="window.location.href='todolist.html';" style="cursor: pointer;">
         <span>📝</span>
         <h3>To-do List</h3>
       </div>
-      <div class="card">
+      <div class="card" onclick="window.location.href='current-events.html';" style="cursor: pointer;">
         <span>📆</span>
         <h3>Current Events</h3>
       </div>
@@ -60,16 +60,14 @@
             <th>Event</th>
             <th>Location</th>
             <th>Date</th>
-            <th>Student Coordinator</th>
-            <th>Staff Coordinator</th>
-            <th>Price</th>
+            <th>Time</th>
+            <th>Student Coordinator(s)</th>
           </tr>
         </thead>
         <tbody id="event-table-body">
         </tbody>
       </table>
     </div>
-  </div>
 
   <script>
     // Ensure DOM is fully loaded
@@ -101,49 +99,49 @@
 
     // Fetch and display events in the table
     async function fetchAndDisplayEvents() {
-      try {
-        const token = localStorage.getItem("authToken");
-        const response = await fetch("http://localhost:3000/organiser/orgEvents", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch("http://localhost:3000/organiser/orgEvents", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch event data");
-        }
-
-        const events = await response.json();
-        const tableBody = document.getElementById("event-table-body");
-        tableBody.innerHTML = ""; // Clear existing rows
-
-        if (events.length === 0 || events.events.length == 0) {
-          tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">No events found</td></tr>`;
-          return;
-        }
-        const eventArray = events;
-        console.log(events);
-        events.events.forEach((event, index, eventArray) => {
-          const row = `
-            <tr>
-              <td>${index + 1}</td>
-              <td>${event.event}</td>
-              <td>${event.location}</td>
-              <td>${new Date(event.date).toLocaleDateString()}</td>
-              <td>${event.stuCoord}</td>
-              <td>${event.staffCoordinator}</td>
-              <td>${event.price}</td>
-            </tr>
-          `;
-          tableBody.insertAdjacentHTML("beforeend", row);
-        });
-      } catch (error) {
-        console.error("Error loading events:", error);
-        alert("Failed to load events. Please try again later.");
+      if (!response.ok) {
+        throw new Error("Failed to fetch event data");
       }
+
+      const events = await response.json();
+      const tableBody = document.getElementById("event-table-body");
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      if (events.length === 0 || events.events.length == 0) {
+        tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center;">No events found</td></tr>`;
+        return;
+      }
+
+      events.events.forEach((event, index) => {
+        const studentCoords = event.stuCoord.map(coord => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`).join('<br>');
+        
+        const row = `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${event.event}</td>
+            <td>${event.location}</td>
+            <td>${new Date(event.date).toLocaleDateString()}</td>
+            <td>${event.time}</td>
+            <td>${studentCoords}</td>
+          </tr>
+        `;
+        tableBody.insertAdjacentHTML("beforeend", row);
+      });
+    } catch (error) {
+      console.error("Error loading events:", error);
+      alert("Failed to load events. Please try again later.");
     }
+  }
 
     // Log out function
     function logout() {

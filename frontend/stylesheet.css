@@ -9,38 +9,47 @@ body {
     background-color: #f4f4f4;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
     background-image: url('https://images.unsplash.com/photo-1522098543979-ffc7f79e2d06');
     background-size: cover;
     background-position: center;
+    color: #333;
+    overflow: auto;
 }
 
-/* Ensure the container maintains a 16:9 aspect ratio */
+/* Ensure the container maintains a 16:9 aspect ratio and allows scrolling */
 .container {
-    width: 100vw; /* Full viewport width */
-    height: calc(100vw * 9 / 16); /* Height based on 16:9 ratio */
-    max-width: 1600px; /* Limit maximum width */
-    max-height: calc(1600px * 9 / 16); /* Limit maximum height */
-    background-color: rgba(255, 255, 255, 0.9);
+    width: 90vw; /* Full viewport width */
+    height: auto; /* Height will be adjusted based on content */
+    max-width: 1200px; /* Limit maximum width */
+    background-color: rgba(255, 255, 255, 0.85);
     padding: 40px;
-    border-radius: 15px;
+    border-radius: 20px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+    max-height: 90vh; /* Prevent it from getting too big for the screen */
 }
 
+/* Header with fixed position at the top */
 .header h1 {
     text-align: center;
-    color: #007bff;
-    margin-bottom: 30px;
+    color: #003366; /* Dark blue color */
+    margin-bottom: 20px;
     font-size: 2.5em; /* Header font size */
+    text-shadow: 2px 2px 10px rgba(0, 51, 102, 0.4); /* Soft text shadow for header */
 }
 
+/* Event form styling */
 .event-form {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 600px;
 }
 
 .form-group {
@@ -50,16 +59,17 @@ body {
 .form-group label {
     font-size: 1.3em;
     margin-bottom: 5px;
-    color: #333;
+    color: #555;
     display: flex;
     align-items: center;
 }
 
 .form-group i {
     margin-right: 10px;
+    color: #003366; /* Dark blue icon color */
 }
 
-.form-group input {
+.form-group input, .form-group textarea {
     width: 100%;
     padding: 14px;
     font-size: 1.2em;
@@ -67,17 +77,23 @@ body {
     border-radius: 5px;
     background-color: #f9f9f9;
     color: #333;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    margin-top: 5px;
 }
 
-.form-group input:focus {
-    border-color: #007bff;
+.form-group input:focus, .form-group textarea:focus {
+    border-color: #003366; /* Dark blue border color */
     outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    box-shadow: 0 0 5px rgba(0, 51, 102, 0.5);
+}
+
+.form-group textarea {
+    height: 120px; /* For description field */
+    resize: vertical;
 }
 
 .submit-btn {
-    padding: 15px;
+    padding: 15px 30px;
     background-color: #28a745;
     color: white;
     font-size: 1.4em;
@@ -88,6 +104,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 20px;
 }
 
 .submit-btn i {
@@ -103,26 +120,70 @@ body {
     outline: none;
 }
 
-/* Ensuring responsiveness for smaller viewports */
+/* Add Student Coordinator button styling */
+.add-btn {
+    padding: 10px 20px;
+    background-color: #0080ff;
+    color: white;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+.add-btn:hover {
+    background-color: #0056b3;
+    box-shadow: 0 8px 15px rgba(0, 123, 255, 0.3);
+}
+
+.add-btn:focus {
+    outline: none;
+}
+
+.add-btn i {
+    margin-right: 10px;
+}
+
+/* Styling for form groups */
+#student-coordinators {
+    margin-top: 15px;
+}
+
+#student-coordinators .form-group {
+    display: flex;
+    gap: 15px;
+}
+
+#student-coordinators .form-group input {
+    width: 30%;
+}
+
+/* Ensure responsiveness for smaller viewports */
 @media (max-width: 800px) {
     .container {
-        width: 100vw;
-        height: auto;
-        max-width: 100%;
-        padding: 20px;
+        min-height: 100vh; /* Fill the entire height of the viewport */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Ensures spacing for the bottom */
+        max-height: 200vh;
     }
+    
 
     .header h1 {
         font-size: 2em;
     }
 
-    .form-group input {
-        padding: 10px;
+    .form-group input, .form-group textarea {
+        padding: 12px;
         font-size: 1.1em;
     }
 
     .submit-btn {
-        padding: 12px;
+        padding: 12px 25px;
         font-size: 1.2em;
     }
 }
