@@ -2,7 +2,7 @@ require('dotenv').config();
 const mongoose=require("mongoose");
 
 const mongoUri = process.env.MONGO_URI;
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(mongoUri);
 
 const organiserSchema=new mongoose.Schema({
     username:String,
@@ -17,10 +17,14 @@ const eventSchema=new mongoose.Schema({
     event:String,
     location:String,
     date:Date,
-    stuCoord:String, //name,no,email
-    //time:String,
-    staffCoordinator: String,
-    price:Number
+    stuCoord:[{
+        name:String,
+        contact:Number,
+        email:String
+    }], //name,no,email
+    time:String,
+    description:String,
+    imageURL:String
 })
 
 const participantSchema=new mongoose.Schema({

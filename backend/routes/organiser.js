@@ -1,7 +1,7 @@
 // Updated organiser.js with Zod validation, improved functionality, and dedicated to-do list management
 const cors = require("cors");
 const express = require("express");
-const organiserMiddleware = require("../db/middleware/organiser");
+const organiserMiddleware = require("../middleware/organiser");
 const router = express.Router();
 const { Organiser, Events } = require("../db");
 const jwt = require("jsonwebtoken");
@@ -21,14 +21,24 @@ const signinSchema = z.object({
 });
 
 const eventSchema = z.object({
-  event: z.string().nonempty("Event name is required"),
-  location: z.string().nonempty("Location is required"),
-  date: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid date format"),
-  stuCoord: z.string().nonempty("Name required"),
-  //time: z.string().nonempty("Time is req"),
-  price: z.number().positive(),
-  staffCoordinator: z.string().nonempty("Name required")
+    event: z.string().nonempty("Event name is required"),
+    location: z.string().nonempty("Location is required"),
+    date: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid date format"),
+    stuCoord: z.array(
+      z.object({
+        name: z.string().nonempty("Student coordinator name is required"),
+        contact: z
+          .string()
+          .nonempty("Contact number is required"),
+        email: z.string().email("Invalid email address"),
+      })
+    ),
+    time: z.string().nonempty("Time is required"),
+    description: z.string().optional(), // Optional description field
+    imageURL: z.string().url("Invalid image URL").optional(), // Optional URL for image
 });
+
+
 
 const todoSchema = z.object({
   task: z.string().nonempty("Task description is required"),
@@ -182,6 +192,32 @@ router.put("/updateTodo", organiserMiddleware, async function (req, res) {
     res.json({ msg: "To-do task updated successfully", toDoList: organiser.toDoList });
   } catch (error) {
     res.status(400).json({ error: error.errors || error.message });
+  }
+});
+
+// Route to fetch events specific to an organiser
+router.get("/events", organiserMiddleware, async (req, res) => {
+  console.log("Route /events called");
+  try {
+    // Assuming `req.username` is set by authentication middleware
+
+    const organiser = await Organiser.findOne({ username: req.username }).populate("orgEvent");
+    console.log( "Organiser found");
+
+    if (!organiser) {
+      return res.status(404).json({ message: "Organiser not found" });
+    }
+
+    const events = organiser.orgEvent;
+
+    if (events.length === 0) {
+      return res.status(404).json({ message: "No events found for this organiser" });
+    }
+
+    res.status(200).json({ events });
+  } catch (error) {
+    console.error("Error fetching organiser events:", error);
+    res.status(500).json({ message: "Error fetching events", error });
   }
 });
 
