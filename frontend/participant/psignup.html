@@ -52,7 +52,7 @@
 
                 try {
                     // Send signup request
-                    const response = await fetch('http://localhost:3000/organiser/signup', {
+                    const response = await fetch('http://localhost:3000/participants/signup', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -71,7 +71,7 @@
 
                         // Redirect to organiser dashboard
                         alert('Signup successful! Redirecting to your dashboard...');
-                        window.location.href = 'new.html';
+                        
                     } else {
                         alert('Signup failed: ' + (data.msg || 'Unknown error'));
                     }

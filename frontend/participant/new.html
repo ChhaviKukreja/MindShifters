@@ -12,9 +12,10 @@
     <h2>Dashboard</h2>
     <ul>
       <li class="active"><span>🏠</span> Home</li>
-      <li onclick="window.location.href='events.html';"><span>📅</span> Events</li>
+      <!-- <li onclick="window.location.href='events.html';"><span>📅</span> Events</li> -->
       <li onclick="window.location.href='feedback.html';"><span>📩</span> feedback form </li>
-      <li onclick="window.location.href='calendar.html';"><span>📆</span> Calendars</li>
+      <li onclick="window.location.href='certificate.html';"><span>📩</span> Download Certificate </li>
+      <li><span>📆</span> Calendars</li>
       <li><span>⚙</span> Settings</li>
     </ul>
   </div>
@@ -23,7 +24,7 @@
   <div class="main-content">
     <!-- Header -->
     <header>
-      <h1>Organiser</h1>
+      <h1>Participant</h1>
       <div class="header-buttons">
         <button class="btn btn-primary" onclick="window.location.href='about.html';">About Us</button>
         <button class="btn btn-secondary" onclick="logout();">Log out</button>
@@ -32,27 +33,27 @@
 
     <!-- Cards Section -->
     <div class="cards">
-      <div class="card" onclick="window.location.href='add-event.html';" style="cursor: pointer;">
+      <div class="card" onclick="window.location.href='events.html';" style="cursor: pointer;">
         <span>📅</span>
-        <h3>Add Event</h3>
+        <h3>All Events</h3>
       </div>
-      <div class="card" onclick="window.location.href='todolist.html';" style="cursor: pointer;">
-        <span>📝</span>
-        <h3>To-do List</h3>
-      </div>
-      <div class="card" onclick="window.location.href='current-events.html';" style="cursor: pointer;">
+      <div class="card" onclick="window.location.href='reg-events.html';" style="cursor: pointer;">
         <span>📆</span>
-        <h3>Current Events</h3>
+        <h3>Registered Events</h3>
       </div>
-      <div class="card" onclick="window.location.href='broadcast.html';" style="cursor: pointer;">
+      <div class="card" onclick="window.location.href='part-direct.html';" style="cursor: pointer;">
+        <span>📝</span>
+        <h3>Participant Directory</h3>
+      </div>
+      <div class="card" onclick="window.location.href='group-chats.html';" style="cursor: pointer;">
         <span>📜</span>
-        <h3>Broadcast notification</h3>
+        <h3>Group chats</h3>
       </div>
     </div>
 
     <!-- Tables Section -->
     <div class="table-section">
-      <h2>Request Administrative Approval</h2>
+      <h2>Registered Events</h2>
       <table>
         <thead>
           <tr>
@@ -82,7 +83,7 @@
         const token = localStorage.getItem("authToken");
         if (!token) throw new Error("No token found");
 
-        const response = await fetch("http://localhost:3000/organiser/auth/check", {
+        const response = await fetch("http://localhost:3000/participants/auth/check", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -101,7 +102,7 @@
     async function fetchAndDisplayEvents() {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:3000/organiser/orgEvents", {
+      const response = await fetch("http://localhost:3000/participants/orgEvents", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

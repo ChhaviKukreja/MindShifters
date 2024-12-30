@@ -24,7 +24,8 @@ const eventSchema=new mongoose.Schema({
     }], //name,no,email
     time:String,
     description:String,
-    imageURL:String
+    imageURL:String,
+    googleForm:String
 })
 
 const participantSchema=new mongoose.Schema({
@@ -36,13 +37,32 @@ const participantSchema=new mongoose.Schema({
     }]
 }) 
 
+const TaskSchema = new mongoose.Schema({
+    taskName: { type: String, required: true },
+    eventName: { type: String, required: true },
+    priority: { type: String, enum: ['High', 'Medium', 'Low'], required: true },
+    responsiblePersons: [{ type: String, required: true }],
+    status: { type: String, enum: ['Not Started', 'In Progress', 'Completed'], required: true },
+    dueDate: { type: Date, required: true },
+    tags: [{ type: String }],
+    subtasks: [
+        {
+            title: { type: String, required: true },
+            isCompleted: { type: Boolean, default: false },
+        }
+    ],
+    notes: { type: String }
+});
+
 const Organiser=mongoose.model("Organiser",organiserSchema);
 const Events=mongoose.model("Events",eventSchema);
 const Participants=mongoose.model("Participants",participantSchema);
+const Tasks = mongoose.model("Tasks",TaskSchema);
 
 module.exports={
     Organiser,
     Events,
-    Participants
+    Participants,
+    Tasks
 }
 

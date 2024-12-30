@@ -3,16 +3,33 @@ const cors = require("cors");
 const express = require("express");
 const organiserMiddleware = require("../middleware/organiser");
 const router = express.Router();
-const { Organiser, Events } = require("../db");
+const { Organiser, Events, Tasks } = require("../db");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
 const { z } = require("zod");
 router.use(cors());
 
 // Zod schemas
+const TaskValidationSchema = z.object({
+  taskName: z.string().min(1, { message: "Task name is required." }),
+  eventName: z.string().min(1, { message: "Event name is required." }),
+  priority: z.enum(['High', 'Medium', 'Low'], { message: "Invalid priority level." }),
+  responsiblePersons: z.array(z.string()).nonempty({ message: "At least one responsible person is required." }),
+  status: z.enum(['Not Started', 'In Progress', 'Completed'], { message: "Invalid status." }),
+  dueDate: z.string(),
+  tags: z.array(z.string()).optional(),
+  subtasks: z.array(
+    z.object({
+      title: z.string().min(1, { message: "Subtask title is required." }),
+      isCompleted: z.boolean().optional(),
+    })
+  ).optional(),
+  notes: z.string().optional()
+});
+
 const signupSchema = z.object({
   username: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must have at least 6 characters"),
+  password: z.string().min(6, "Password must have at least 6 characters")
 });
 
 const signinSchema = z.object({
@@ -21,21 +38,22 @@ const signinSchema = z.object({
 });
 
 const eventSchema = z.object({
-    event: z.string().nonempty("Event name is required"),
-    location: z.string().nonempty("Location is required"),
-    date: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid date format"),
-    stuCoord: z.array(
-      z.object({
-        name: z.string().nonempty("Student coordinator name is required"),
-        contact: z
-          .string()
-          .nonempty("Contact number is required"),
-        email: z.string().email("Invalid email address"),
-      })
-    ),
-    time: z.string().nonempty("Time is required"),
-    description: z.string().optional(), // Optional description field
-    imageURL: z.string().url("Invalid image URL").optional(), // Optional URL for image
+  event: z.string().nonempty("Event name is required"),
+  location: z.string().nonempty("Location is required"),
+  date: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid date format"),
+  stuCoord: z.array(
+    z.object({
+      name: z.string().nonempty("Student coordinator name is required"),
+      contact: z
+        .string()
+        .nonempty("Contact number is required"),
+      email: z.string().email("Invalid email address"),
+    })
+  ),
+  time: z.string().nonempty("Time is required"),
+  description: z.string().optional(), // Optional description field
+  imageURL: z.string().url("Invalid image URL").optional(), // Optional URL for image
+  googleForm: z.string().url("Invalid image URL").optional()
 });
 
 
@@ -47,6 +65,7 @@ const todoSchema = z.object({
 
 // Routes
 router.post("/signup", async function (req, res) {
+  
   try {
     const { username, password } = signupSchema.parse(req.body);
 
@@ -57,8 +76,8 @@ router.post("/signup", async function (req, res) {
 
     await Organiser.create({ username, password });
     const token = jwt.sign({ username }, JWT_SECRET);
-    
-    res.json({ msg: "Organiser created successfully" , token: token});
+
+    res.json({ msg: "Organiser created successfully", token: token });
 
   } catch (error) {
     res.status(400).json({ error: error.errors || error.message });
@@ -202,7 +221,7 @@ router.get("/events", organiserMiddleware, async (req, res) => {
     // Assuming `req.username` is set by authentication middleware
 
     const organiser = await Organiser.findOne({ username: req.username }).populate("orgEvent");
-    console.log( "Organiser found");
+    console.log("Organiser found");
 
     if (!organiser) {
       return res.status(404).json({ message: "Organiser not found" });
@@ -217,6 +236,71 @@ router.get("/events", organiserMiddleware, async (req, res) => {
     res.status(200).json({ events });
   } catch (error) {
     console.error("Error fetching organiser events:", error);
+    res.status(500).json({ message: "Error fetching events", error });
+  }
+});
+
+router.post("/tasks", async (req, res) => {
+  try {
+    // Validate incoming data
+    const data = TaskValidationSchema.parse(req.body);
+
+    // Find and update the task
+    const updatedTask = await Tasks.create(data);
+
+    if (!updatedTask) {
+      return res.status(404).json({ error: "Task not found." });
+    }
+
+    // Send response
+    return res.status(200).json({ message: "Task updated successfully", task: updatedTask });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: error.errors });
+    }
+    console.error("Error updating task:", error);
+    res.status(500).json({ error: "An error occurred while updating the task." });
+  }
+});
+
+
+router.get("/tasks", async (req, res) => {
+  try {
+    // Extract event name from query parameters
+    const event  = req.query.event;  // Extract 'event' from the query string
+
+    if (!event) {
+      return res.status(400).json({ error: "Event name is required" });
+    }
+
+    // Find tasks associated with the event
+    const tasks = await Tasks.find({ eventName: event });  // Assuming the tasks have an 'eventName' field
+    console.log("Found tasks:", tasks);
+
+    if (!tasks || tasks.length === 0) {
+      return res.status(404).json({ error: "No tasks found for this event." });
+    }
+
+    // Respond with the found tasks
+    res.status(200).json( {tasks} );
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    res.status(500).json({ error: "An error occurred while fetching tasks." });
+  }
+});
+
+router.get("/all-events", async (req, res) => {
+  console.log("Route /all-events called");
+  try {
+    const events = await Events.find(); // Replace 'Event' with your actual event model name if different
+
+    if (events.length === 0) {
+      return res.status(404).json({ message: "No events found in the database" });
+    }
+
+    res.status(200).json({ events });
+  } catch (error) {
+    console.error("Error fetching all events:", error);
     res.status(500).json({ message: "Error fetching events", error });
   }
 });
