@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Event Management System</title>
+  <title>Registered Events</title>
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
     rel="stylesheet"
@@ -19,15 +19,15 @@
       font-weight: bold;
       font-size: 1.5rem;
     }
-    /* .register-btn {
+    .register-btn {
       background-color: #28a745;
       color: white;
-    } */
+    }
   </style>
 </head>
 <body>
   <div class="container mt-4">
-    <h1 class="text-center mb-4" style="color: #28a745;">All Events</h1>
+    <h1 class="text-center mb-4" style="color: #28a745;">Registered Events</h1>
     <div id="event-container" class="row">
       <!-- Event cards will be dynamically inserted here -->
     </div>
@@ -35,25 +35,25 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      fetchAllEvents();
+      fetchEvents();
     });
 
-    async function fetchAllEvents() {
+    async function fetchEvents() {
       try {
-        const response = await fetch("http://localhost:3000/organiser/all-events", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+      const response = await fetch("http://localhost:3000/participants/reg-events", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Ensure authToken is stored correctly
+      },
+    });
 
-        if (!response.ok) {
-          console.error("Failed to fetch events:", response.status, response.statusText);
-          return;
-        }
-
+    if (!response.ok) {
+      console.error("Failed to fetch events:", response.status, response.statusText);
+      return;
+    }
         const events = await response.json();
-        displayEvents(events); // Pass the array of events directly
+        displayEvents(events);
       } catch (error) {
         console.error("Error fetching events:", error);
       }
@@ -94,7 +94,6 @@
                         `).join('')}
                       </ul>
                       <strong>Description:</strong> ${event.description || "No description available."}<br>
-                      <strong>Google Form Link:</strong> <a href="${event.googleForm}" target="_blank">Click here to access the form</a><br>
                     </p>
                   </div>
                 </div>

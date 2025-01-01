@@ -54,15 +54,43 @@ const TaskSchema = new mongoose.Schema({
     notes: { type: String }
 });
 
+const announcementSchema = new mongoose.Schema({
+    eventName: String,
+    title: String,
+    content: String,
+    date: { type: Date, default: Date.now },
+  });
+
+const feedbackSchema = new mongoose.Schema({
+    name: String,
+    event: String,
+    rating: String,
+    message: String,
+    createdAt: { type: Date, default: Date.now },
+});
+
+const chatSchema = new mongoose.Schema({
+    eventId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    sender: { type: String, required: true },
+    message: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+  });
+  
+const Announcement = mongoose.model('Announcement', announcementSchema);
 const Organiser=mongoose.model("Organiser",organiserSchema);
 const Events=mongoose.model("Events",eventSchema);
 const Participants=mongoose.model("Participants",participantSchema);
 const Tasks = mongoose.model("Tasks",TaskSchema);
+const Feedback = mongoose.model("Feedback", feedbackSchema);
+const Chat = mongoose.model('Chat', chatSchema);
 
 module.exports={
     Organiser,
     Events,
     Participants,
-    Tasks
+    Tasks,
+    Announcement,
+    Feedback,
+    Chat
 }
 

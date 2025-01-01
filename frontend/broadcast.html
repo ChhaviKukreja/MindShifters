@@ -1,77 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Announcements</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Organizer Dashboard - Announcements</title>
     <style>
         body {
-            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
         }
-        .announcement-container {
-            max-width: 600px;
-            margin: 50px auto;
-            background: #fff;
+
+        .container {
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container input,
+        .form-container textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-container button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .announcement-container {
+            padding: 15px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+        }
+
+        .announcement {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .announcement h4 {
+            margin: 0;
+            color: #007bff;
+        }
+
+        .announcement p {
+            margin: 5px 0;
+        }
+
+        .announcement small {
+            font-size: 0.8em;
+            color: #777;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div class="announcement-container">
-            <h3 class="text-center mb-4">Send Announcement</h3>
-            <form id="announcementForm">
-                <div class="mb-3">
-                    <label for="title" class="form-label">Announcement Title</label>
-                    <input type="text" id="title" class="form-control" placeholder="Enter title" required>
-                </div>
-                <div class="mb-3">
-                    <label for="message" class="form-label">Message</label>
-                    <textarea id="message" class="form-control" rows="4" placeholder="Enter your message" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Send Announcement</button>
-            </form>
+        <!-- Form to create announcements -->
+        <div class="form-container">
+            <h2>Create Announcement</h2>
+            <input type="text" id="eventName" placeholder="Enter Event Name" required>
+            <input type="text" id="title" placeholder="Title" required>
+            <textarea id="content" placeholder="Content" rows="4" required></textarea>
+            <button onclick="createAnnouncement()">Submit</button>
+        </div>
 
-            <div class="mt-4">
-                <h4 class="text-center">Announcements</h4>
-                <ul id="announcementList" class="list-group">
-                    <!-- Real-time announcements will appear here -->
-                </ul>
-            </div>
+        <!-- Announcements list -->
+        <div class="announcement-container">
+            <h2>Recent Announcements</h2>
+            <div id="announcement-list"></div>
         </div>
     </div>
 
     <script>
-        const form = document.getElementById('announcementForm');
-        const announcementList = document.getElementById('announcementList');
+        // Function to fetch announcements
+        async function fetchAnnouncements(eventName) {
+            
+            try {
+                const response = await fetch(`http://localhost:3000/organiser/announcements?event=${eventName}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const announcements = await response.json();
+                displayAnnouncements(announcements);
+            } catch (err) {
+                console.error('Error fetching announcements:', err);
+            }
+        }
 
-        // Connect to the server using WebSocket
-        const socket = new WebSocket('ws://localhost:3000');
+        // Function to display announcements
+        function displayAnnouncements(announcements) {
+            
+            const announcementList = document.getElementById('announcement-list');
+            announcementList.innerHTML = ''; // Clear previous announcements
+            if (!eventName) {
+                announcementList.innerHTML = "<li class='list-group-item text-danger'>Event name is undefined.</li>";
+                return;
+            }
 
-        // Send new announcements to the server
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
+            announcements.announcements.forEach(announcement => {
+                const div = document.createElement('div');
+                div.classList.add('announcement');
+                div.innerHTML = `
+                    <h4>${announcement.eventName}</h4>
+                    <h4>${announcement.title}</h4>
+                    <p>${announcement.content}</p>
+                    <small>${new Date(announcement.date).toLocaleString()}</small>
+                `;
+                announcementList.appendChild(div);
+            });
+
+            if (announcements.length === 0) {
+                    announcementList.innerHTML = "<li class='list-group-item'>No announcement available for this event.</li>";
+                    return;
+                }
+        }
+
+        // Function to create a new announcement
+        async function createAnnouncement() {
+            const eventName = document.getElementById('eventName').value;
             const title = document.getElementById('title').value;
-            const message = document.getElementById('message').value;
+            const content = document.getElementById('content').value;
 
-            // Send announcement via WebSocket
-            socket.send(JSON.stringify({ title, message }));
+            if (!eventName || !title || !content) {
+                alert('Please fill in all fields.');
+                return;
+            }
 
-            // Clear the form
-            form.reset();
+            try {
+                const response = await fetch('http://localhost:3000/organiser/create-announcement', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ eventName, title, content }),
+                });
+
+                if (response.ok) {
+                    alert('Announcement created successfully!');
+                    document.getElementById('eventName').value = '';
+                    document.getElementById('title').value = '';
+                    document.getElementById('content').value = '';
+                    fetchAnnouncements(eventName); // Refresh announcements
+                } else {
+                    console.error('Error creating announcement:', await response.json());
+                }
+            } catch (err) {
+                console.error('Error creating announcement:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const eventNameInput = document.getElementById('eventName');
+            const defaultEventName = eventNameInput.value || 'DefaultEvent'; // Provide a default event name if empty
+            fetchAnnouncements(defaultEventName);
         });
 
-        // Receive announcements in real-time
-        socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            const listItem = document.createElement('li');
-            listItem.className = 'list-group-item';
-            listItem.innerHTML = `<strong>${data.title}:</strong> ${data.message}`;
-            announcementList.prepend(listItem);
-        };
+        // Polling to get the latest announcements every 5 seconds
+        setInterval(() => {
+            const eventName = document.getElementById('eventName').value || 'DefaultEvent';
+            fetchAnnouncements(eventName);
+        }, 5000);
     </script>
 </body>
+
 </html>

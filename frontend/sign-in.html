@@ -31,60 +31,60 @@
                     </form>
                 </div>
             </div>
-        </section> 
+        </section>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.querySelector('form');
-    const emailInput = document.querySelector('input[type="email"]');
-    const passwordInput = document.querySelector('input[type="password"]');
-    const rememberMeCheckbox = document.querySelector('input[type="checkbox"]');
-    
-    // Handle form submission
-    loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Prevent default form submission
-        
-        // Get the email and password values
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
-        
-        // Validate the inputs
-        if (!email || !password) {
-            alert("Please fill in both email and password.");
-            return;
-        }
+                const loginForm = document.querySelector('form');
+                const emailInput = document.querySelector('input[type="email"]');
+                const passwordInput = document.querySelector('input[type="password"]');
+                const rememberMeCheckbox = document.querySelector('input[type="checkbox"]');
 
-        try {
-            // Send credentials to the server for authentication
-            const response = await fetch('http://localhost:3000/organiser/signin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: email, password })
+                // Handle form submission
+                loginForm.addEventListener('submit', async (event) => {
+                    event.preventDefault(); // Prevent default form submission
+
+                    // Get the email and password values
+                    const email = emailInput.value.trim();
+                    const password = passwordInput.value.trim();
+
+                    // Validate the inputs
+                    if (!email || !password) {
+                        alert("Please fill in both email and password.");
+                        return;
+                    }
+
+                    try {
+                        // Send credentials to the server for authentication
+                        const response = await fetch('http://localhost:3000/organiser/signin', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username: email, password })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.status === 200 && data.token) {
+                            // Store the token in localStorage for session persistence
+                            localStorage.setItem('authToken', data.token);
+
+                            // Redirect to new.html after successful login
+                            window.location.href = 'new.html';
+                        } else {
+                            alert("Login failed: " + data.msg);
+                        }
+                    } catch (error) {
+                        console.error("Error during login:", error);
+                        alert("An error occurred during login. Please try again later.");
+                    }
+                });
+
+                // Pre-fill email if it's saved in localStorage
+                const savedEmail = localStorage.getItem('rememberedEmail');
+                if (savedEmail) {
+                    emailInput.value = savedEmail;
+                    rememberMeCheckbox.checked = true;
+                }
             });
-
-            const data = await response.json();
-
-            if (response.status === 200 && data.token) {
-                // Store the token in localStorage for session persistence
-                localStorage.setItem('authToken', data.token);
-                
-                // Redirect to new.html after successful login
-                window.location.href = 'new.html';
-            } else {
-                alert("Login failed: " + data.msg);
-            }
-        } catch (error) {
-            console.error("Error during login:", error);
-            alert("An error occurred during login. Please try again later.");
-        }
-    });
-
-    // Pre-fill email if it's saved in localStorage
-    const savedEmail = localStorage.getItem('rememberedEmail');
-    if (savedEmail) {
-        emailInput.value = savedEmail;
-        rememberMeCheckbox.checked = true;
-    }
-});
         </script>
     </body>
 </body>

@@ -14,8 +14,8 @@
       <li class="active"><span>🏠</span> Home</li>
       <!-- <li onclick="window.location.href='events.html';"><span>📅</span> Events</li> -->
       <li onclick="window.location.href='feedback.html';"><span>📩</span> feedback form </li>
-      <li onclick="window.location.href='certificate.html';"><span>📩</span> Download Certificate </li>
-      <li><span>📆</span> Calendars</li>
+      <li onclick="window.location.href='templates/certificate.html';"><span>📩</span> Download Certificate </li>
+      <li onclick="window.location.href='calendar.html';"><span>📆</span> Calendars</li>
       <li><span>⚙</span> Settings</li>
     </ul>
   </div>
@@ -41,11 +41,11 @@
         <span>📆</span>
         <h3>Registered Events</h3>
       </div>
-      <div class="card" onclick="window.location.href='part-direct.html';" style="cursor: pointer;">
+      <div class="card" onclick="window.location.href='notifications.html';" style="cursor: pointer;">
         <span>📝</span>
-        <h3>Participant Directory</h3>
+        <h3>Notifications</h3>
       </div>
-      <div class="card" onclick="window.location.href='group-chats.html';" style="cursor: pointer;">
+      <div class="card" onclick="window.location.href='group-chat.html';" style="cursor: pointer;">
         <span>📜</span>
         <h3>Group chats</h3>
       </div>
@@ -102,7 +102,7 @@
     async function fetchAndDisplayEvents() {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:3000/participants/orgEvents", {
+      const response = await fetch("http://localhost:3000/participants/reg-events", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

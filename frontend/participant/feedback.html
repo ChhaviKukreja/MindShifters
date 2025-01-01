@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Feedback System</title>
+    <title>Event Feedback Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
         }
-        .feedback-container {
-            max-width: 800px;
+        .form-container {
+            max-width: 600px;
             margin: 50px auto;
             background: #fff;
             padding: 20px;
@@ -21,8 +21,8 @@
 </head>
 <body>
     <div class="container">
-        <div class="feedback-container">
-            <h3 class="text-center mb-4">Event Feedback</h3>
+        <div class="form-container">
+            <h3 class="text-center mb-4">Submit Feedback</h3>
             <form id="feedbackForm">
                 <div class="mb-3">
                     <label for="participantName" class="form-label">Your Name</label>
@@ -49,25 +49,14 @@
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Submit Feedback</button>
             </form>
-
-            <div class="mt-5">
-                <h4 class="text-center">Feedback Received</h4>
-                <ul id="feedbackList" class="list-group">
-                    <!-- Real-time feedback will appear here -->
-                </ul>
-            </div>
         </div>
     </div>
 
     <script>
         const feedbackForm = document.getElementById('feedbackForm');
-        const feedbackList = document.getElementById('feedbackList');
 
-        // Connect to the server using WebSocket
-        const socket = new WebSocket('ws://localhost:3000');
-
-        // Submit feedback to the server
-        feedbackForm.addEventListener('submit', (e) => {
+        // Handle form submission
+        feedbackForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const name = document.getElementById('participantName').value;
@@ -75,24 +64,27 @@
             const rating = document.getElementById('rating').value;
             const message = document.getElementById('feedbackMessage').value;
 
-            // Send feedback via WebSocket
-            socket.send(JSON.stringify({ name, event, rating, message }));
+            // Send feedback to the server
+            try {
+                const response = await fetch('http://localhost:3000/participants/feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, event, rating, message }),
+                });
 
-            // Clear the form
-            feedbackForm.reset();
+                if (response.ok) {
+                    alert('Feedback submitted successfully!');
+                    feedbackForm.reset();
+                } else {
+                    alert('Failed to submit feedback. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                alert('An error occurred. Please try again later.');
+            }
         });
-
-        // Receive feedback in real time
-        socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            const listItem = document.createElement('li');
-            listItem.className = 'list-group-item';
-            listItem.innerHTML = `
-                <strong>${data.name}</strong> (Event: ${data.event}) - Rating: ${data.rating}/5
-                <p>${data.message}</p>
-            `;
-            feedbackList.prepend(listItem);
-        };
     </script>
 </body>
 </html>

@@ -3,10 +3,20 @@ const cors = require("cors");
 const express = require("express");
 const organiserMiddleware = require("../middleware/organiser");
 const router = express.Router();
-const { Organiser, Events, Tasks } = require("../db");
+const { Organiser, Events, Tasks, Announcement, Feedback } = require("../db");
+//const http = require('http');
+//const WebSocket = require('ws');
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
 const { z } = require("zod");
+// const server = http.createServer(router);
+//const wss = new WebSocket.Server({ server });
+// console.log(require.resolve('./websocketServer'));
+// const path = require('path');
+// console.log('Resolved path for websocketServer.js:', path.resolve('./websocketServer'));
+// const { broadcast } = require("../../../websocketServer");
+
+
 router.use(cors());
 
 // Zod schemas
@@ -216,12 +226,10 @@ router.put("/updateTodo", organiserMiddleware, async function (req, res) {
 
 // Route to fetch events specific to an organiser
 router.get("/events", organiserMiddleware, async (req, res) => {
-  console.log("Route /events called");
   try {
     // Assuming `req.username` is set by authentication middleware
 
     const organiser = await Organiser.findOne({ username: req.username }).populate("orgEvent");
-    console.log("Organiser found");
 
     if (!organiser) {
       return res.status(404).json({ message: "Organiser not found" });
@@ -305,4 +313,98 @@ router.get("/all-events", async (req, res) => {
   }
 });
 
+// // Store connected clients
+// let clients = [];
+
+// wss.on('connection', (ws) => {
+//     console.log('A participant connected.');
+//     clients.push(ws);
+
+//     // Remove client when they disconnect
+//     ws.on('close', () => {
+//         clients = clients.filter((client) => client !== ws);
+//         console.log('A participant disconnected.');
+//     });
+
+//     // Log received messages (optional)
+//     ws.on('message', (data) => {
+//         console.log(`Received message: ${data}`);
+//     });
+// });
+
+// // Route to broadcast announcements to all participants
+// // router.post('/send-announcement', (req, res) => {
+// //     const { title, message } = req.body;
+
+// //     if (!title || !message) {
+// //         return res.status(400).json({ error: 'Title and message are required' });
+// //     }
+
+// //     // Broadcast announcement to all connected clients
+// //     const announcement = JSON.stringify({ title, message });
+// //     clients.forEach((client) => {
+// //         if (client.readyState === WebSocket.OPEN) {
+// //             client.send(announcement);
+// //         }
+// //     });
+
+// //     console.log('Announcement sent:', announcement);
+// //     res.json({ success: true, message: 'Announcement sent successfully!' });
+// // });
+
+router.post('/send-announcement', (req, res) => {
+  const { title, message } = req.body;
+
+  if (!title || !message) {
+      return res.status(400).json({ error: 'Title and message are required' });
+  }
+
+  // Broadcast the announcement
+  broadcast({ title, message });
+  console.log('Announcement sent:', { title, message });
+
+  res.json({ success: true, message: 'Announcement sent successfully!' });
+});
+
+router.post('/create-announcement', async (req, res) => {
+  const { eventName, title, content } = req.body;
+
+  try {
+    const newAnnouncement = new Announcement({ eventName, title, content });
+    await newAnnouncement.save();
+    res.status(201).json(newAnnouncement);
+  } catch (err) {
+    res.status(500).json({ message: 'Error creating announcement', error: err.message });
+  }
+});
+
+router.get('/announcements', async (req, res) => {
+  try {
+    const event  = req.query.event;  // Extract 'event' from the query string
+
+    if (!event) {
+      return res.status(400).json({ error: "Event name is required" });
+    }
+    
+    const announcements = await Announcement.find({ eventName: event }).sort({ date: -1 });
+    if (!announcements || announcements.length === 0) {
+      return res.status(404).json({ error: "No announcements for this event" });
+    }
+    res.status(200).json( {announcements} );
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get('/feedback', async (req, res) => {
+  try {
+      const feedbacks = await Feedback.find().sort({ createdAt: -1 });
+      res.status(200).json(feedbacks);
+  } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch feedbacks' });
+  }
+});
+
+// Start the server
 module.exports = router;

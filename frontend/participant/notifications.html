@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participant Dashboard - Announcements</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .announcement-container {
+            padding: 15px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+        }
+
+        .announcement {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .announcement h4 {
+            margin: 0;
+            color: #007bff;
+        }
+
+        .announcement p {
+            margin: 5px 0;
+        }
+
+        .announcement small {
+            font-size: 0.8em;
+            color: #777;
+        }
+
+        select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Event Selection -->
+        <div class="form-container">
+            <h2>Select Event</h2>
+            <select id="eventSelector" onchange="fetchAnnouncementsByEvent()">
+                <option value="">Select an Event</option>
+            </select>
+        </div>
+
+        <!-- Announcements list -->
+        <div class="announcement-container">
+            <h2>Event Announcements</h2>
+            <div id="announcement-list"></div>
+        </div>
+    </div>
+
+    <!-- <select id="eventSelector" onchange="fetchAnnouncementsByEvent()">
+        <option value="">Select an Event</option>
+    </select> -->
+    
+    <script>
+        async function fetchRegisteredEvents() {
+            try {
+                const response = await fetch("http://localhost:3000/participants/reg-events", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                    },
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                console.log('Registered Events:', data); // Debug registered events
+                populateEventDropdown(data.events);
+            } catch (err) {
+                console.error('Error fetching registered events:', err);
+            }
+        }
+    
+        async function fetchAnnouncementsByEvent() {
+            const eventName = document.getElementById('eventSelector').value;
+            console.log('Selected Event:', eventName); // Debug selected event
+    
+            if (!eventName) {
+                document.getElementById('announcement-list').innerHTML = "<p class='text-danger'>Please select an event to view announcements.</p>";
+                return;
+            }
+    
+            try {
+                const response = await fetch(`http://localhost:3000/participants/part-announcements?event=${eventName}`);
+                console.log('API Response Status:', response.status); // Debug status
+    
+                const announcements = await response.json();
+                console.log('Announcements:', announcements); // Debug announcements data
+                displayAnnouncements(announcements);
+            } catch (err) {
+                console.error('Error fetching announcements:', err);
+            }
+        }
+    
+        function populateEventDropdown(events) {
+            const eventSelector = document.getElementById('eventSelector');
+            events.forEach(event => {
+                const option = document.createElement('option');
+                option.value = event.event;
+                option.textContent = event.event;
+                eventSelector.appendChild(option);
+            });
+        }
+    
+        function displayAnnouncements(announcements) {
+            const announcementList = document.getElementById('announcement-list');
+            announcementList.innerHTML = '';
+    
+            if (announcements.announcements.length === 0) {
+                announcementList.innerHTML = "<p>No announcements available for this event.</p>";
+                return;
+            }
+    
+            announcements.announcements.forEach(announcement => {
+                const div = document.createElement('div');
+                div.classList.add('announcement');
+                div.innerHTML = `
+                    <h4>${announcement.title}</h4>
+                    <p>${announcement.content}</p>
+                    <small>${new Date(announcement.date).toLocaleString()}</small>
+                `;
+                announcementList.appendChild(div);
+            });
+        }
+    
+        document.addEventListener('DOMContentLoaded', fetchRegisteredEvents);
+
+        setInterval(() => {
+            //const eventName = document.getElementById('eventName').value || 'DefaultEvent';
+            fetchAnnouncements();
+        }, 5000);
+    </script>
+    
+</body>
+
+</html>
