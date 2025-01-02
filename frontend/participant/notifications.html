@@ -87,6 +87,37 @@
     </select> -->
     
     <script>
+        let pollInterval; // Store the interval ID
+        let currentEventName = ""; // Track the currently selected event
+    
+        // Function to start polling
+        function startPolling() {
+            // Clear any existing interval
+            if (pollInterval) clearInterval(pollInterval);
+    
+            // Set up polling every 3 seconds
+            pollInterval = setInterval(async () => {
+                if (currentEventName) {
+                    console.log("Polling for new announcements...");
+                    await fetchAnnouncementsByEvent();
+                }
+            }, 3000); // Poll every 3 seconds
+        }
+    
+        // Function to handle event selection change
+        function handleEventChange() {
+            currentEventName = document.getElementById('eventSelector').value;
+    
+            if (currentEventName) {
+                // Start polling when a valid event is selected
+                startPolling();
+            } else {
+                // Stop polling if no event is selected
+                if (pollInterval) clearInterval(pollInterval);
+            }
+        }
+    
+        // Function to fetch registered events
         async function fetchRegisteredEvents() {
             try {
                 const response = await fetch("http://localhost:3000/participants/reg-events", {
@@ -102,34 +133,29 @@
                 }
     
                 const data = await response.json();
-                console.log('Registered Events:', data); // Debug registered events
                 populateEventDropdown(data.events);
             } catch (err) {
                 console.error('Error fetching registered events:', err);
             }
         }
     
+        // Function to fetch announcements
         async function fetchAnnouncementsByEvent() {
-            const eventName = document.getElementById('eventSelector').value;
-            console.log('Selected Event:', eventName); // Debug selected event
-    
-            if (!eventName) {
+            if (!currentEventName) {
                 document.getElementById('announcement-list').innerHTML = "<p class='text-danger'>Please select an event to view announcements.</p>";
                 return;
             }
     
             try {
-                const response = await fetch(`http://localhost:3000/participants/part-announcements?event=${eventName}`);
-                console.log('API Response Status:', response.status); // Debug status
-    
+                const response = await fetch(`http://localhost:3000/participants/part-announcements?event=${currentEventName}`);
                 const announcements = await response.json();
-                console.log('Announcements:', announcements); // Debug announcements data
                 displayAnnouncements(announcements);
             } catch (err) {
                 console.error('Error fetching announcements:', err);
             }
         }
     
+        // Function to populate event dropdown
         function populateEventDropdown(events) {
             const eventSelector = document.getElementById('eventSelector');
             events.forEach(event => {
@@ -138,8 +164,12 @@
                 option.textContent = event.event;
                 eventSelector.appendChild(option);
             });
+    
+            // Add change event listener
+            eventSelector.addEventListener('change', handleEventChange);
         }
     
+        // Function to display announcements
         function displayAnnouncements(announcements) {
             const announcementList = document.getElementById('announcement-list');
             announcementList.innerHTML = '';
@@ -161,13 +191,10 @@
             });
         }
     
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', fetchRegisteredEvents);
-
-        setInterval(() => {
-            //const eventName = document.getElementById('eventName').value || 'DefaultEvent';
-            fetchAnnouncements();
-        }, 5000);
     </script>
+    
     
 </body>
 

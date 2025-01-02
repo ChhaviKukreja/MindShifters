@@ -7,12 +7,12 @@ const router = express.Router();
 // const http = require('http');
 // const server = http.createServer(router);
 // server.on('upgrade', handleWebSocket);
-const { Organiser, Events, Tasks, Participants, Announcement, Feedback } = require("../db");
+const { Organiser, Events, Tasks, Participants, Announcement, Feedback, Chat } = require("../db");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
 const { z } = require("zod");
-const PDFDocument = require('pdfkit');
-const fs = require('fs');
+//const PDFDocument = require('pdfkit');
+//const fs = require('fs');
 router.use(cors());
 
 const signupSchema = z.object({
@@ -141,8 +141,6 @@ router.post("/register", participantMiddleware, async (req, res) => {
   });
   
   router.get('/reg-events', participantMiddleware, async (req, res) => {
-    //const username = req.username; // Extract username from JWT
-  
     try {
       // Find the participant based on the username
       const participant = await Participants.findOne({ username: req.username }).populate('regEvent');
@@ -151,13 +149,11 @@ router.post("/register", participantMiddleware, async (req, res) => {
       }
   
       // Get the list of events the participant has registered for
-      console.log("hello1")
       const events = participant.regEvent;
 
       if (events.length === 0) {
         return res.status(200).json({ message: 'No events registered', events: [] });
       }
-      console.log("hello")
       return res.status(200).json({ events: events});
 
     } catch (error) {
@@ -212,13 +208,11 @@ router.post("/register", participantMiddleware, async (req, res) => {
 router.get('/part-announcements', async (req, res) => {
     try {
         const event = req.query.event;
-        console.log(event);
         if (!event) {
             return res.status(400).json({ error: "Event name is required" });
         }
 
         const announcements = await Announcement.find({ eventName: event }).sort({ date: -1 });
-        console.log(announcements);
         res.status(200).json({ announcements });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -237,8 +231,11 @@ router.post('/feedback', async (req, res) => {
 
 router.get('/chats/:eventId', async (req, res) => {
     try {
+
       const { eventId } = req.params;
+
       const messages = await Chat.find({ eventId }).sort({ timestamp: 1 });
+
       res.json(messages);
     } catch (error) {
       res.status(500).send('Error fetching messages');
@@ -247,11 +244,18 @@ router.get('/chats/:eventId', async (req, res) => {
   
   // Send a new message
 router.post('/chats', async (req, res) => {
+
     try {
       const { eventId, sender, message } = req.body;
       const newMessage = new Chat({ eventId, sender, message });
-      await newMessage.save();
-      res.status(201).json(newMessage);
+      try {
+        await newMessage.save();
+        res.status(201).json(newMessage);
+      } catch (saveError) {
+        console.error("Error saving message to the database:", saveError);
+        res.status(500).send('Error saving message to the database');
+      }
+      // res.status(201).json(newMessage);
     } catch (error) {
       res.status(500).send('Error saving message');
     }
@@ -269,15 +273,15 @@ router.post('/chats', async (req, res) => {
 
 //     // Set response headers
 //     res.setHeader('Content-Type', 'application/pdf');
-//     res.setHeader('Content-Disposition', `attachment; filename=${name}-certificate.pdf`);
+//     res.setHeader('Content-Disposition', attachment; filename=${name}-certificate.pdf);
 
 //     // Write PDF content
 //     doc.fontSize(24).text('Certificate of Completion', { align: 'center' });
 //     doc.moveDown();
-//     doc.fontSize(18).text(`This certifies that ${name}`, { align: 'center' });
+//     doc.fontSize(18).text(This certifies that ${name}, { align: 'center' });
 //     doc.text('has successfully completed the event.', { align: 'center' });
 //     doc.moveDown();
-//     doc.fontSize(14).text(`Email: ${email}`, { align: 'center' });
+//     doc.fontSize(14).text(Email: ${email}, { align: 'center' });
 //     doc.moveDown(2);
 //     doc.text('Congratulations!', { align: 'center' });
 
@@ -286,4 +290,9 @@ router.post('/chats', async (req, res) => {
 //     doc.end();
 // });
 
-module.exports = router;
+router.get('/profile', participantMiddleware, (req, res) => {
+  // Return username in the response for the frontend
+  res.json({ username: req.username });
+});
+
+module.exports=router;

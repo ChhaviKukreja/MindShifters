@@ -4,6 +4,15 @@ const mongoose=require("mongoose");
 const mongoUri = process.env.MONGO_URI;
 mongoose.connect(mongoUri);
 
+const adminSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+    pendingRequests: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Events"
+    }]
+  });
+
 const organiserSchema=new mongoose.Schema({
     username:String,
     password:String,
@@ -83,6 +92,7 @@ const Participants=mongoose.model("Participants",participantSchema);
 const Tasks = mongoose.model("Tasks",TaskSchema);
 const Feedback = mongoose.model("Feedback", feedbackSchema);
 const Chat = mongoose.model('Chat', chatSchema);
+const Admin = mongoose.model("Admin", adminSchema);
 
 module.exports={
     Organiser,
@@ -91,6 +101,7 @@ module.exports={
     Tasks,
     Announcement,
     Feedback,
-    Chat
+    Chat,
+    Admin
 }
 

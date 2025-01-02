@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Event Management System</title>
+  <title>Ongoing Events</title>
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
     rel="stylesheet"
@@ -27,7 +27,7 @@
 </head>
 <body>
   <div class="container mt-4">
-    <h1 class="text-center mb-4" style="color: #28a745;">Event Management System</h1>
+    <h1 class="text-center mb-4" style="color: #28a745;">Ongoing Events</h1>
     <div id="event-container" class="row">
       <!-- Event cards will be dynamically inserted here -->
     </div>
@@ -58,14 +58,12 @@
         const events = await response.json();
         console.log(events, "fetching events");
         displayEvents(events);
-        console.log("hey")
       } catch (error) {
         console.error("Error fetching events:", error);
       }
     }
 
     function displayEvents(events) {
-      console.log("hello 1")
       const container = document.getElementById("event-container");
       container.innerHTML = ""; // Clear existing content
 
@@ -101,7 +99,6 @@
                       </ul>
                       <strong>Description:</strong> ${event.description || "No description available."}<br>
                     </p>
-                    <button class="btn register-btn">Register</button>
                   </div>
                 </div>
               </div>
