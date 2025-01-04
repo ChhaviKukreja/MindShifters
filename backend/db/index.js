@@ -3,7 +3,12 @@ const mongoose=require("mongoose");
 
 const mongoUri = process.env.MONGO_URI;
 console.log("Mongo uri is -> ", mongoUri);
-mongoose.connect(mongoUri);
+mongoose.connect(mongoUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  connectTimeoutMS: 60000, // 60 seconds
+  socketTimeoutMS: 60000,  // 60 seconds
+});
 console.log("Connected successfully");
 const organiserSchema=new mongoose.Schema({
     username:String,
