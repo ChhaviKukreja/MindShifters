@@ -1,9 +1,10 @@
 require('dotenv').config();
 const mongoose=require("mongoose");
 
-const mongoUri = process.env.MONGO_URI || "mongodb+srv://padam_007:hanumanji@cluster1.vzqhy.mongodb.net/Ideathon";
+const mongoUri = process.env.MONGO_URI;
+console.log("Mongo uri is -> ", mongoUri);
 mongoose.connect(mongoUri);
-
+console.log("Connected successfully");
 const organiserSchema=new mongoose.Schema({
     username:String,
     password:String,
