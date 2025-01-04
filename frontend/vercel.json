@@ -1,7 +1,7 @@
 {
     "rewrites": [
       {
-        "source": "https://event-management-portal-chi.vercel.app/:path*",
+        "source": "/:path*",
         "destination": "https://event-management-portal-chi.vercel.app/:path*"
       }
     ],
@@ -14,7 +14,7 @@
     ],
     "headers": [
       {
-        "source": "https://event-management-portal-chi.vercel.app/:path*",
+        "source": "/:path*",
         "headers": [
           {
             "key": "Access-Control-Allow-Origin",
