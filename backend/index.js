@@ -7,7 +7,11 @@ const participantRouter = require('./routes/participants');
 const adminRouter = require('./routes/admin');
 // const { server } = require("./routes/websocketServer");
 // const { Events } = require("./db");
-app.use(cors());
+app.use(cors({
+    origin: "https://mind-shifters-pp01dizwi-mindshifters-projects.vercel.app",
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'Content-Type']
+  }));
 //const userRouter = require('./routes/user');
 app.use(express.json());
 app.use(bodyParser.json());
