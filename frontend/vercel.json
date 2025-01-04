@@ -1,20 +1,20 @@
 {
     "rewrites": [
       {
-        "source": "/api/:path*",
+        "source": "https://event-management-portal-chi.vercel.app/:path*",
         "destination": "https://event-management-portal-chi.vercel.app/:path*"
       }
     ],
     "redirects": [
       {
         "source": "/",
-        "destination": "/frontend/sign-in.html",
+        "destination": "/sign-in.html",
         "permanent": true
       }
     ],
     "headers": [
       {
-        "source": "/api/:path*",
+        "source": "https://event-management-portal-chi.vercel.app/:path*",
         "headers": [
           {
             "key": "Access-Control-Allow-Origin",
