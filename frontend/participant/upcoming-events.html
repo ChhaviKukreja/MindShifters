@@ -331,6 +331,8 @@ h1 {
     </div>
   </div>
 
+  <script src="config.js"></script>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       fetchAllEvents();
@@ -338,7 +340,7 @@ h1 {
 
     async function fetchAllEvents() {
       try {
-        const response = await fetch("http://localhost:3000/participants/all-events", {
+        const response = await fetch(`${API_BASE_URL}/participants/all-events`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -420,7 +422,7 @@ h1 {
 
     async function confirmRegistration(eventId) {
       try {
-        const response = await fetch("http://localhost:3000/participants/register", {
+        const response = await fetch(`${API_BASE_URL}/participants/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -171,6 +171,7 @@
             </div>
         </div>
     </section>
+    <script src="config.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const handleSignup = async () => {
@@ -190,7 +191,7 @@
                 }
 
                 try {
-                    const response = await fetch(`http://localhost:3000/${role}/signup`, {
+                    const response = await fetch(`${API_BASE_URL}/${role}/signup`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ username: email, password }),

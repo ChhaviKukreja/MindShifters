@@ -439,6 +439,8 @@
         <button onclick="joinChat()">Join Chat</button>
     </div>
 
+    <script src="config.js"></script>
+
     <script>
         let currentEventId = null;
         let pollInterval = null;
@@ -474,7 +476,7 @@
         // API Functions
         async function fetchMessages(eventId) {
             try {
-                const response = await fetch(`http://localhost:3000/participants/chats/${eventId}`, {
+                const response = await fetch(`${API_BASE_URL}/participants/chats/${eventId}`, {
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
                         "Content-Type": "application/json"
@@ -491,7 +493,7 @@
 
         async function fetchRegisteredEvents() {
             try {
-                const response = await fetch("http://localhost:3000/participants/reg-events", {
+                const response = await fetch(`${API_BASE_URL}/participants/reg-events`, {
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
                     }
@@ -510,7 +512,7 @@
                 const username = localStorage.getItem("username").split('@')[0];
                 if (!username) throw new Error("Username not found");
 
-                const response = await fetch('http://localhost:3000/participants/chats', {
+                const response = await fetch(`${API_BASE_URL}/participants/chats`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

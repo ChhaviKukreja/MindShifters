@@ -435,6 +435,7 @@
     </div>
 
     <!-- JavaScript -->
+    <script src="config.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const feedbackList = document.getElementById('feedbackList');
@@ -484,7 +485,7 @@
             // Function to fetch feedback from the server
             async function fetchFeedback() {
                 try {
-                    const response = await fetch('http://localhost:3000/organiser/feedback');
+                    const response = await fetch(`${API_BASE_URL}/organiser/feedback`);
                     const data = await response.json();
     
                     // Update rating counts and feedback list

@@ -171,6 +171,7 @@
             </div>
         </div>
     </div>
+    <script src="config.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -183,7 +184,7 @@
 
             try {
                 // Replace with your backend URL
-                const response = await fetch("http://localhost:3000/organiser/events", {
+                const response = await fetch(`${API_BASE_URL}/organiser/events`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -231,7 +232,7 @@
 
             try {
                 // Replace with your backend URL
-                const response = await fetch(`http://localhost:3000/organiser/tasks?event=${eventName}`, {
+                const response = await fetch(`${API_BASE_URL}/organiser/tasks?event=${eventName}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -324,7 +325,7 @@
             };
 
             try {
-                const response = await fetch("http://localhost:3000/organiser/tasks", {
+                const response = await fetch(`${API_BASE_URL}/organiser/tasks`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

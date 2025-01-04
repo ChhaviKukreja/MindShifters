@@ -69,6 +69,7 @@
         </tbody>
       </table>
     </div>
+    <script src="config.js"></script>
 
   <script>
     // Ensure DOM is fully loaded
@@ -83,7 +84,7 @@
         const token = localStorage.getItem("authToken");
         if (!token) throw new Error("No token found");
 
-        const response = await fetch("http://localhost:3000/participants/auth/check", {
+        const response = await fetch(`${API_BASE_URL}/participants/auth/check`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -102,7 +103,7 @@
     async function fetchAndDisplayEvents() {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:3000/participants/reg-events", {
+      const response = await fetch(`${API_BASE_URL}/participants/reg-events`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

@@ -152,12 +152,12 @@
         <h2>Recent Announcements</h2>
         <div id="announcement-list"></div>
     </div>
-
+    <script src="config.js"></script>
     <script>
         // Function to fetch announcements
         async function fetchAnnouncements(eventName) {
             try {
-                const response = await fetch(`http://localhost:3000/organiser/announcements?event=${eventName}`, {
+                const response = await fetch(`${API_BASE_URL}/organiser/announcements?event=${eventName}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -207,7 +207,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3000/organiser/create-announcement', {
+                const response = await fetch(`${API_BASE_URL}/organiser/create-announcement`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

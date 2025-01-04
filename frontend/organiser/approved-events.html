@@ -225,6 +225,7 @@
     <h1 class="text-center mb-4">Approved Events</h1>
     <div id="event-container" class="row g-4"></div>
   </div>
+  <script src="config.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -233,7 +234,7 @@
 
     async function fetchEvents() {
       try {
-        const response = await fetch("http://localhost:3000/organiser/events", {
+        const response = await fetch(`${API_BASE_URL}/organiser/events`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

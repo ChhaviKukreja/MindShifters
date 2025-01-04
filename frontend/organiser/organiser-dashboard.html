@@ -69,6 +69,8 @@
       </table>
     </div>
 
+    <script src="config.js"></script>
+
   <script>
     // Ensure DOM is fully loaded
     document.addEventListener("DOMContentLoaded", () => {
@@ -82,7 +84,7 @@
         const token = localStorage.getItem("authToken");
         if (!token) throw new Error("No token found");
 
-        const response = await fetch("http://localhost:3000/organiser/auth/check", {
+        const response = await fetch(`${API_BASE_URL}/organiser/auth/check`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -101,7 +103,7 @@
     async function fetchAndDisplayEvents() {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:3000/organiser/orgEvents", {
+      const response = await fetch(`${API_BASE_URL}/organiser/orgEvents`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

@@ -330,6 +330,7 @@ h1 {
       <!-- Event cards will be dynamically inserted here -->
     </div>
   </div>
+  <script src="config.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -338,7 +339,7 @@ h1 {
 
     async function fetchAllEvents() {
       try {
-        const response = await fetch("http://localhost:3000/organiser/all-events", {
+        const response = await fetch(`${API_BASE_URL}/organiser/all-events`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

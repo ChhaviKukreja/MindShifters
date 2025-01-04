@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -70,8 +71,8 @@
             transition: 0.3s ease-in-out;
         }
 
-        .inputbox input:focus ~ label,
-        .inputbox input:not(:placeholder-shown) ~ label {
+        .inputbox input:focus~label,
+        .inputbox input:not(:placeholder-shown)~label {
             top: -10px;
             font-size: 0.8em;
             color: #ff9800;
@@ -142,6 +143,7 @@
         }
     </style>
 </head>
+
 <body>
     <section>
         <div class="form-box">
@@ -167,6 +169,8 @@
             </div>
         </div>
     </section>
+
+    <script src="config.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const handleSignin = async () => {
@@ -180,10 +184,10 @@
                 }
 
                 try {
-                    const response = await fetch(`http://localhost:3000/${role}/signin`, {
+                    const response = await fetch(`${API_BASE_URL}/${role}/signin`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ username:email, password }),
+                        body: JSON.stringify({ username: email, password }),
                     });
 
                     const data = await response.json();
@@ -213,4 +217,5 @@
         });
     </script>
 </body>
+
 </html>

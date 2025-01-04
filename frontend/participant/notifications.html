@@ -255,6 +255,7 @@
             </div>
         </div>
     </div>
+    <script src="config.js"></script>
 
     <script>
         let pollInterval;
@@ -293,7 +294,7 @@
 
         async function fetchRegisteredEvents() {
             try {
-                const response = await fetch("http://localhost:3000/participants/reg-events", {
+                const response = await fetch(`${API_BASE_URL}/participants/reg-events`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -319,7 +320,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/participants/part-announcements?event=${currentEventName}`);
+                const response = await fetch(`${API_BASE_URL}/participants/part-announcements?event=${currentEventName}`);
                 const announcements = await response.json();
                 displayAnnouncements(announcements);
             } catch (err) {

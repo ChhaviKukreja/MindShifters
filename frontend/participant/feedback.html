@@ -191,6 +191,7 @@
             </form>
         </div>
     </div>
+    <script src="config.js"></script>
 
     <script>
         const feedbackForm = document.getElementById('feedbackForm');
@@ -206,7 +207,7 @@
 
             // Send feedback to the server
             try {
-                const response = await fetch('http://localhost:3000/participants/feedback', {
+                const response = await fetch(`${API_BASE_URL}/participants/feedback`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

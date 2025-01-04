@@ -234,6 +234,8 @@
     </section>
   </div>
 
+  <script src="config.js"></script>
+
   <script>
     // JavaScript Code
     document.addEventListener("DOMContentLoaded", () => {
@@ -246,9 +248,10 @@
     async function checkAuth() {
       try {
         const token = localStorage.getItem("authToken");
+        console.log("here is token",token);
         if (!token) throw new Error("No token found");
 
-        const response = await fetch("http://localhost:3000/admin/auth/check", {
+        const response = await fetch(`${API_BASE_URL}/admin/auth/check`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -267,7 +270,7 @@
     async function fetchPendingEvents() {
       try {
         const token = localStorage.getItem("authToken");
-        const response = await fetch("http://localhost:3000/admin/pending-requests", {
+        const response = await fetch(`${API_BASE_URL}/admin/pending-requests`, {
           method: "GET",
           headers: { "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -319,7 +322,7 @@
       console.log("yooooooo", eventId);
       try {
         const token = localStorage.getItem("authToken");
-        const response = await fetch(`http://localhost:3000/admin/approve/${eventId}`, {
+        const response = await fetch(`${API_BASE_URL}/admin/approve/${eventId}`, {
           method: "POST",
           headers: {
           "Content-Type": "application/json",
@@ -344,7 +347,7 @@
     async function fetchEventCounts() {
   try {
     const token = localStorage.getItem("authToken");
-    const response = await fetch("http://localhost:3000/admin/event-counts", {
+    const response = await fetch(`${API_BASE_URL}/admin/event-counts`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

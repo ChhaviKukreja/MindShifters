@@ -112,13 +112,15 @@
     <div id="calendar"></div>
   </div>
 
+  <script src="config.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async function () {
       const calendarEl = document.getElementById('calendar');
 
       try {
-        const response = await fetch("http://localhost:3000/participants/reg-events", {
+        const response = await fetch(`${API_BASE_URL}/participants/reg-events`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
