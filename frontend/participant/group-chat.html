@@ -594,6 +594,8 @@
         </div>
     </div>
 
+    <script src="config.js"></script>
+
     <script>
         // Theme switcher functionality
         const lightTheme = document.getElementById('light-theme');
@@ -649,7 +651,7 @@
         // Fetch registered events for the participant
         async function fetchRegisteredEvents() {
             try {
-                const response = await fetch("http://localhost:3000/participants/reg-events", {
+                const response = await fetch(`${API_BASE_URL}/participants/reg-events`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -694,7 +696,7 @@
         // Fetch chat messages for an event
         async function fetchMessages(eventId) {
             try {
-                const response = await fetch(`http://localhost:3000/participants/chats/${eventId}`);
+                const response = await fetch(`${API_BASE_URL}/participants/chats/${eventId}`);
                 if (response.ok) {
                     return await response.json();
                 } else {
@@ -762,7 +764,7 @@
                     return;
                 }
 
-                const response = await fetch('http://localhost:3000/participants/chats', {
+                const response = await fetch(`${API_BASE_URL}/participants/chats`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ eventId, sender: username, message }),
