@@ -8,7 +8,7 @@ const adminRouter = require('./routes/admin');
 // const { server } = require("./routes/websocketServer");
 // const { Events } = require("./db");
 app.use(cors({
-    origin: "https://mind-shifters-pp01dizwi-mindshifters-projects.vercel.app",
+    origin: "https://mind-shifters-f.vercel.app",
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Authorization', 'Content-Type']
   }));
