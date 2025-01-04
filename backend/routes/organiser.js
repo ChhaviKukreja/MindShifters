@@ -3,7 +3,7 @@ const cors = require("cors");
 const express = require("express");
 const organiserMiddleware = require("../middleware/organiser");
 const router = express.Router();
-const { Organiser, Events, Tasks, Announcement, Feedback } = require("../db");
+const { Organiser, Events, Tasks, Announcement, Feedback, Admin } = require("../db");
 //const http = require('http');
 //const WebSocket = require('ws');
 const jwt = require("jsonwebtoken");
@@ -129,10 +129,16 @@ router.post("/eventReg", organiserMiddleware, async function (req, res) {
 
     console.log("Updating organiser:", username, "with event ID:", eventId);
 
-    // Update the organiser's orgEvent array
+    const admin = await Admin.findOne();
+    const updateAdmin=await Admin.updateOne(
+      { "$push": { pendingRequests: eventId } }
+    );
+    
+
+    //Update the organiser's orgEvent array
     const updateResult = await Organiser.updateOne(
       { username: username },
-      { "$push": { orgEvent: eventId } }
+      { "$push": { dummyEvent: eventId } }
     );
 
     // Log the result of the update
@@ -152,14 +158,58 @@ router.post("/eventReg", organiserMiddleware, async function (req, res) {
 
 router.get("/orgEvents", organiserMiddleware, async function (req, res) {
   try {
-    const organiser = await Organiser.findOne({ username: req.username }).populate("orgEvent");
+    const organiser = await Organiser.findOne({ username: req.username }).populate("dummyEvent");
     if (!organiser)
       return res.status(404).json({ error: "Organiser not found" });
-    res.json({ events: organiser.orgEvent });
+    res.json({ events: organiser.dummyEvent });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
+
+// Add a new event and send it for administrative approval
+router.post("/add-event", organiserMiddleware, async (req, res) => {
+  const { event, location, date, stuCoord, time, description, imageURL, googleForm } = req.body;
+
+  try {
+    // Create a new event document
+    const newEvent = new Event({
+      event,
+      location,
+      date,
+      stuCoord,
+      time,
+      description,
+      imageURL,
+      googleForm,
+    });
+
+    // Save the new event
+    const savedEvent = await newEvent.save();
+
+    // Find the admin and add the new event to the pendingRequests
+    const admin = await Admin.findOne();
+    if (admin) {
+      admin.pendingRequests.push(savedEvent._id);
+      await admin.save();
+    } else {
+      return res.status(500).json({ message: "Admin not found to handle the request." });
+    }
+
+    // Add the event to the organizer's orgEvent list
+    const organiser = await Organiser.findOne({ username: req.username });
+    if (organiser) {
+      organiser.orgEvent.push(savedEvent._id);
+      await organiser.save();
+    }
+
+    res.status(201).json({ message: "Event created and sent for administrative approval.", event: savedEvent });
+  } catch (error) {
+    console.error("Error adding event:", error);
+    res.status(500).json({ message: "Failed to create the event." });
+  }
+});
+
 
 // Edit functionality
 router.put("/editEvent/:id", organiserMiddleware, async function (req, res) {
@@ -227,7 +277,7 @@ router.put("/updateTodo", organiserMiddleware, async function (req, res) {
 // Route to fetch events specific to an organiser
 router.get("/events", organiserMiddleware, async (req, res) => {
   try {
-    // Assuming `req.username` is set by authentication middleware
+    // Assuming req.username is set by authentication middleware
 
     const organiser = await Organiser.findOne({ username: req.username }).populate("orgEvent");
 
@@ -328,7 +378,7 @@ router.get("/all-events", async (req, res) => {
 
 //     // Log received messages (optional)
 //     ws.on('message', (data) => {
-//         console.log(`Received message: ${data}`);
+//         console.log(Received message: ${data});
 //     });
 // });
 

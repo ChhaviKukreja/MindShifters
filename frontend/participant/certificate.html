@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-family: 'Playfair Display', serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #feeed4;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: #22584d;
+            border-radius: 50%;
+            top: -200px;
+            left: -200px;
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: #2e3030;
+            border-radius: 50%;
+            bottom: -100px;
+            right: -100px;
+            z-index: -1;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #f35a1e, #d6041d);
+            border-radius: 17px;
+            z-index: -1;
+        }
+
+        h1 {
+            text-align: center;
+            color: #f7f9fb;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            font-family: 'Playfair Display', serif;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #f4f7fa;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid rgba(47, 54, 64, 0.2);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #222525;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #660202;
+            box-shadow: 0 0 0 3px rgba(102, 2, 2, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(90deg, #f9fae8, #2F3640);
+            color: rgb(8, 7, 7);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 2, 2, 0.2);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Rest of the HTML remains the same -->
+    <div class="container">
+        <h1>Certificate Generator</h1>
+        <div class="form-group">
+            <label for="name">Participant Name</label>
+            <input type="text" id="name" placeholder="Enter participant name">
+        </div>
+        <div class="form-group">
+            <label for="event">Event Name</label>
+            <input type="text" id="event" placeholder="Enter event name">
+        </div>
+        <button id="generateBtn" onclick="generateCertificate()">Generate Certificate</button>
+    </div>
+
+    <!-- JavaScript remains the same -->
+    <script>
+        window.jsPDF = window.jspdf.jsPDF;
+
+        function generateCertificate() {
+            const name = document.getElementById('name').value;
+            const eventName = document.getElementById('event').value;
+
+            if (!name || !eventName) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // Add background (golden color between borders)
+            doc.setFillColor(218, 165, 32);
+            doc.rect(0, 0, 297, 210, 'F');
+
+            // Add inner cream-colored rectangle
+            doc.setFillColor(246, 244, 211);
+            doc.rect(15, 15, 267, 180, 'F');
+
+            // Add borders
+            doc.setDrawColor(0, 0, 128);
+            
+            // Outer border
+            doc.setLineWidth(2);
+            doc.rect(5, 5, 287, 200);
+            
+            // Inner border
+            doc.setLineWidth(1);
+            doc.rect(15, 15, 267, 180);
+
+            // Add title
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(48);
+            doc.setTextColor(0, 0, 128);
+            doc.text('CERTIFICATE', 148.5, 50, { align: 'center' });
+            
+            doc.setFontSize(24);
+            doc.text('OF PARTICIPATION', 148.5, 65, { align: 'center' });
+
+            doc.setFontSize(16);
+            doc.setTextColor(0, 0, 0);
+            doc.text('This Certificate is Proudly Presented To', 148.5, 90, { align: 'center' });
+
+            doc.setFontSize(40);
+            doc.setTextColor(0, 0, 128);
+            doc.setFont('helvetica', 'italic');
+            doc.text(name, 148.5, 110, { align: 'center' });
+
+            doc.setFontSize(20);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`This certificate is given to ${name} for his/her participation in the`, 148.5, 135, { align: 'center' });
+            doc.text(`Event - ${eventName}`, 148.5, 145, { align: 'center' });
+
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('HEAD OF EVENT', 148.5, 180, { align: 'center' });
+
+            doc.save('certificate.pdf');
+        }
+
+        const nameInput = document.getElementById('name');
+        const eventInput = document.getElementById('event');
+        const generateBtn = document.getElementById('generateBtn');
+
+        function updateButtonState() {
+            generateBtn.disabled = !nameInput.value || !eventInput.value;
+        }
+
+        nameInput.addEventListener('input', updateButtonState);
+        eventInput.addEventListener('input', updateButtonState);
+        updateButtonState();
+    </script>
+</body>
+</html>

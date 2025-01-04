@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background: linear-gradient(135deg, #63b1db, #33ccfa);
+            position: relative;
+            overflow-y: auto;
+            padding: 40px 0;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: #2F3640;
+            border-radius: 50%;
+            top: -200px;
+            left: -200px;
+            z-index: -1;}
+        
+        body::after {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: #660202;
+            border-radius: 50%;
+            bottom: -100px;
+            right: -100px;
+            z-index: -1;}
+        
+        .dashboard-wrapper {
+            min-height: auto;
+            width: 1000px;
+            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
+        }
+        
+        .dashboard-nav {
+            background: linear-gradient(135deg, #2d4bd1 0%, #764ba2 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-title {
+            color: white;
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            position: relative;
+            z-index: 1; 
+            background: rgba(254, 254, 143, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.15),
+                0 2px 10px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(11, 10, 10, 0.927);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;         
+            height: 3px;
+            background: linear-gradient(90deg, #2d4bd1, #764ba2, #2d4bd1);
+            background-size: 200% 100%;
+            animation: gradientMove 3s linear infinite;
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+        
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(10, 10, 10, 0.979);
+        }
+        
+        .dashboard-header h3 {
+            color: #080809;
+            font-weight: 600;
+            margin: 1rem;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #E2E8F0 0%, #EDF2F7 100%);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.975);
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(31, 38, 135, 0.2);
+            background: linear-gradient(135deg, #EDF2F7 0%, #F7FAFC 100%);
+        }
+        
+        .stat-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .feedback-section {
+            margin-top: 2rem;
+        }
+        
+        .feedback-section h4 {
+            color: #242c3a;
+            margin-bottom: 1rem;
+        }
+        
+        .list-group {
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .list-group-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            padding: 1.8rem;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(248, 241, 222, 0.833);
+            margin-bottom: 1rem;
+            border-radius: 15px;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.05),
+                0 1px 2px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .list-group-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(to bottom, #2d4bd1, #764ba2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .list-group-item:hover {
+            transform: translateX(5px) translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.1),
+                0 3px 6px rgba(0, 0, 0, 0.08);
+            background: rgb(251, 255, 235);
+        }
+        
+        .list-group-item:hover::before {
+            opacity: 1;
+        }
+        
+        .event-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+            order: 1;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .event-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, #2d4bd1, #764ba2);
+            transition: width 0.3s ease;
+        }
+        
+        .list-group-item:hover .event-title::after {
+            width: 100px;
+        }
+        
+        .rating {
+            font-size: 1.3rem;
+            font-weight: 500;
+            order: 2;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+        
+        .list-group-item:hover .rating {
+            transform: scale(1.05);
+        }
+        
+        .rating[data-rating="1"]
+        {
+            color : #dc3545; /* Red */
+        }
+        .rating[data-rating="2"] 
+        {
+            color: #fa7312; /*orange*/
+        }
+        
+        .rating[data-rating="3"] {
+            color: #d7a40b; /* Mustard */
+        }
+        
+        .rating[data-rating="4"] {
+            color: #05af0b; /* Blue */
+        }
+        
+        .rating[data-rating="5"] {
+            color: #093822; /* Green */
+        }
+        
+        /* ... (previous CSS remains the same until .dashboard-header) ... */
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;  /* Changed from center to allow for the new ratings component */
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(9, 10, 10, 0.203);
+        }
+        
+        /* New Rating Distribution Styles */
+        .ratings-distribution {
+            display: flex;
+            gap: 0.8rem;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 12px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .rating-indicator {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .rating-indicator::before {
+            content: attr(data-rating);
+            position: absolute;
+            top: -20px;
+            font-size: 0.75rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .rating-indicator:hover {
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+        
+        .rating-1 {
+            background: linear-gradient(135deg, #ff6b6b, #dc3545);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
+        }
+        
+        .rating-2 {
+            background: linear-gradient(135deg, #ffa502, #ff7f50);
+            box-shadow: 0 4px 15px rgba(255, 165, 2, 0.2);
+        }
+        
+        .rating-3 {
+            background: linear-gradient(135deg, #ffd700, #d7a40b);
+            box-shadow: 0 4px 15px rgba(215, 164, 11, 0.2);
+        }
+        
+        .rating-4 {
+            background: linear-gradient(135deg, #20bf6b, #05af0b);
+            box-shadow: 0 4px 15px rgba(32, 191, 107, 0.2);
+        }
+        
+        .rating-5 {
+            background: linear-gradient(135deg, #0652dd, #093822);
+            box-shadow: 0 4px 15px rgba(6, 82, 221, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+            
+            .ratings-distribution {
+                width: 100%;
+                justify-content: space-between;
+                order: -1;  /* Makes it appear at the top on mobile */
+            }
+            
+            .rating-indicator {
+                width: 40px;
+                height: 40px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* ... (rest of the previous CSS remains the same) ... */
+        
+        
+        /* Enhanced Feedback Content */
+        .feedback-content {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #171c25;
+            order: 3;
+            padding: 0.5rem 0;
+        }
+        
+        /* Enhanced Feedback Submitter */
+        .feedback-submitter {
+            font-size: 1.1rem;
+            color: #2d3748;
+            font-weight: 500;
+            order: 4;
+            padding: 0.3rem 0;
+        }
+        
+        /* Enhanced Feedback Meta */
+        .feedback-meta {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #3d4756;
+            padding-top: 0.8rem;
+            margin-top: 0.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.664);
+            order: 5;
+        }
+        
+        /* Responsive Design Improvements */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        
+            .list-group-item {
+                padding: 1.5rem;
+                margin-bottom: 0.8rem;
+            }
+        
+            .event-title {
+                font-size: 1.2rem;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <nav class="dashboard-nav">
+            <h2 class="nav-title">Dashboard</h2>
+        </nav>
+        
+        <div class="container">
+            <div class="dashboard-container">
+                <header class="dashboard-header">
+                    <h3>Feedback Dashboard</h3>
+                    <div class="ratings-distribution">
+                        <div class="rating-indicator rating-5" data-rating="5★" id="rating-5-count">0</div>
+                        <div class="rating-indicator rating-4" data-rating="4★" id="rating-4-count">0</div>
+                        <div class="rating-indicator rating-3" data-rating="3★" id="rating-3-count">0</div>
+                        <div class="rating-indicator rating-2" data-rating="2★" id="rating-2-count">0</div>
+                        <div class="rating-indicator rating-1" data-rating="1★" id="rating-1-count">0</div>
+                    </div>
+                </header>
+                
+                <div class="feedback-section">
+                    <h4>Recent Feedback</h4>
+                    <ul id="feedbackList" class="list-group"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const feedbackList = document.getElementById('feedbackList');
+    
+            // Function to update rating counts from backend data
+            function updateRatingCounts(data) {
+                const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    
+                // Count ratings from the data
+                data.forEach(feedback => {
+                    if (feedback.rating >= 1 && feedback.rating <= 5) {
+                        ratingCounts[feedback.rating]++;
+                    }
+                });
+    
+                // Update the display
+                Object.keys(ratingCounts).forEach(rating => {
+                    const element = document.getElementById(`rating-${rating}-count`);
+                    if (element) {
+                        element.textContent = ratingCounts[rating];
+                    }
+                });
+            }
+    
+            // Function to populate the feedback list
+            function populateFeedbackList(data) {
+                // Clear the current feedback list
+                feedbackList.innerHTML = '';
+    
+                // Add feedback items
+                data.forEach(feedback => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.innerHTML = `
+                        <h5 class="event-title">${feedback.event}</h5>
+                        <div class="rating" data-rating="${feedback.rating}">Rating: ${feedback.rating}/5</div>
+                        <p class="feedback-content">${feedback.message}</p>
+                        <div class="feedback-submitter">${feedback.name}</div>
+                        <div class="feedback-meta">
+                            <span class="meta-date">Submitted on: ${new Date(feedback.createdAt).toLocaleString()}</span>
+                        </div>
+                    `;
+                    feedbackList.appendChild(listItem);
+                });
+            }
+    
+            // Function to fetch feedback from the server
+            async function fetchFeedback() {
+                try {
+                    const response = await fetch('http://localhost:3000/organiser/feedback');
+                    const data = await response.json();
+    
+                    // Update rating counts and feedback list
+                    updateRatingCounts(data);
+                    populateFeedbackList(data);
+                } catch (error) {
+                    console.error('Error fetching feedback:', error);
+                }
+            }
+    
+            // Polling to fetch feedback every 5 seconds
+            setInterval(fetchFeedback, 5000);
+    
+            // Initial fetch
+            fetchFeedback();
+        });
+    </script>
+</body>
+</html>

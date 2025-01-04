@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+
+            background:
+                linear-gradient(45deg, #12c2e9, #c471ed, #f64f59),
+                url('data:image/svg+xml,%3Csvg width="20" height="20" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M0 0h20v20H0z" fill="%23000" fill-opacity=".05"/%3E%3C/svg%3E');
+            background-size: 200% 200%, 20px 20px;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #2b5876, #4e4376);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            color: #2b5876;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #a1c4fd;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.9);
+            box-sizing: border-box; /* Ensures perfect alignment */
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #4e4376;
+            box-shadow: 0 0 20px rgba(161, 196, 253, 0.4);
+            transform: translateY(-2px);
+        }
+
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #2b5876, #4e4376);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(43, 88, 118, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(43, 88, 118, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .announcement {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .announcement h4 {
+            margin: 0 0 10px;
+            font-size: 1.2rem;
+            color: #4e4376;
+        }
+
+        .announcement p {
+            margin: 0 0 10px;
+            font-size: 1rem;
+        }
+
+        .announcement small {
+            display: block;
+            font-size: 0.9rem;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Send Announcement</h1>
+
+        <div class="form-group">
+            <label for="eventName">Event Name</label>
+            <input type="text" id="eventName" placeholder="Enter event name">
+        </div>
+
+        <div class="form-group">
+            <label for="title">Announcement Title</label>
+            <input type="text" id="title" placeholder="Enter title">
+        </div>
+
+        <div class="form-group">
+            <label for="content">Message</label>
+            <textarea id="content" placeholder="Enter your message"></textarea>
+        </div>
+
+        <button onclick="createAnnouncement()">Send Announcement</button>
+
+        <h2>Recent Announcements</h2>
+        <div id="announcement-list"></div>
+    </div>
+
+    <script>
+        // Function to fetch announcements
+        async function fetchAnnouncements(eventName) {
+            try {
+                const response = await fetch(`http://localhost:3000/organiser/announcements?event=${eventName}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const announcements = await response.json();
+                displayAnnouncements(announcements);
+            } catch (err) {
+                console.error('Error fetching announcements:', err);
+            }
+        }
+
+        // Function to display announcements
+        function displayAnnouncements(announcements) {
+            const announcementList = document.getElementById('announcement-list');
+            announcementList.innerHTML = ''; // Clear previous announcements
+
+            announcements.announcements.forEach(announcement => {
+                const div = document.createElement('div');
+                div.classList.add('announcement');
+                div.innerHTML = `
+                    <h4>Event: ${announcement.eventName}</h4>
+                    <h4>Title: ${announcement.title}</h4>
+                    <p>Message: ${announcement.content}</p>
+                    <small>Date: ${new Date(announcement.date).toLocaleString()}</small>`
+                ;
+                announcementList.appendChild(div);
+            });
+
+            if (announcements.announcements.length === 0) {
+                announcementList.innerHTML = "<p>No announcements available for this event.</p>";
+            }
+        }
+
+        // Function to create a new announcement
+        async function createAnnouncement() {
+            const eventName = document.getElementById('eventName').value;
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+
+            if (!eventName || !title || !content) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/organiser/create-announcement', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ eventName, title, content }),
+                });
+
+                if (response.ok) {
+                    alert('Announcement created successfully!');
+                    document.getElementById('eventName').value = '';
+                    document.getElementById('title').value = '';
+                    document.getElementById('content').value = '';
+                    fetchAnnouncements(eventName); // Refresh announcements
+                } else {
+                    console.error('Error creating announcement:', await response.json());
+                }
+            } catch (err) {
+                console.error('Error creating announcement:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAnnouncements('DefaultEvent'); // Initial fetch for a default event
+        });
+
+        // Polling to get the latest announcements every 5 seconds
+        setInterval(() => {
+            const eventName = document.getElementById('eventName').value || 'DefaultEvent';
+            fetchAnnouncements(eventName);
+        }, 5000);
+    </script>
+</body>
+
+</html>

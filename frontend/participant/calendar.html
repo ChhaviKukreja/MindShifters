@@ -5,60 +5,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gradient Project Calendar</title>
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+ 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Sixtyfour&display=swap');
+
+    :root {
+      --primary-color: #6262dc;
+      --secondary-color: #f43f5e;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --info-color: #3b82f6;
+      --background: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #4b5563;
+      --border-color: #e5e7eb;
+    }
+
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f9f9f9;
+      font-family: 'Outfit', sans-serif;
+      background-color: #f8fafc;
       margin: 0;
       padding: 0;
+      -webkit-font-smoothing: antialiased;
+      background-image: url(calendar.jpg);
     }
 
     #calendar-container {
-      max-width: 1100px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+      max-width: 930px;
+      margin: 40px auto;
+      background: var(--background);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.03),
+        0 2px 4px rgba(0, 0, 0, 0.05),
+        0 12px 24px rgba(0, 0, 0, 0.05);
+      border: 4px solid black;
+    }
+
+    .fc .fc-toolbar-title {
+      font-family: "Sixtyfour", serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      background-color: #1f2937;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .fc .fc-button {
+      height: 40px;
+      padding: 0 16px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
       border-radius: 8px;
-    }
-
-    #calendar {
-      margin-top: 20px;
-    }
-
-    .fc .fc-daygrid-day-number {
-      font-weight: bold;
-      color: #333;
+      transition: all 0.2s ease;
+      position: relative;
     }
 
     .fc-event {
       border: none;
-      border-radius: 8px;
-      padding: 8px;
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: #fff;
+      padding: 4px 8px;
+      margin: 1px 2px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    /* Gradient Background Colors for Events */
-    .event-blue {
-      background: linear-gradient(135deg, #9bb5ff, #5f86ff);
+    .fc-event:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .event-orange {
-      background: linear-gradient(135deg, #ffc286, #ff9d49);
+    .fc-daygrid-event-harness:nth-of-type(1) .fc-event {
+      background-color: #3b82f6;  /* Blue */
     }
 
-    .event-green {
-      background: linear-gradient(135deg, #a6f4c5, #34d399);
+    .fc-daygrid-event-harness:nth-of-type(2) .fc-event {
+      background-color: #f5a525;  /* Red */
+    } 
+
+    .fc-daygrid-event-harness:nth-of-type(3) .fc-event {
+      background-color: #10b981;  /* Green */
     }
 
-    .event-pink {
-      background: linear-gradient(135deg, #ff99c8, #ff77a9);
+    .fc-daygrid-event-harness:nth-of-type(4) .fc-event {
+      background-color: #f59e0b;  /* Orange */
     }
 
-    .event-purple {
-      background: linear-gradient(135deg, #d8b4fe, #a78bfa);
+    .fc-daygrid-event-harness:nth-of-type(5) .fc-event {
+      background-color: #8b5cf6;  /* Purple */
     }
   </style>
 </head>
@@ -66,18 +111,18 @@
   <div id="calendar-container">
     <div id="calendar"></div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async function () {
       const calendarEl = document.getElementById('calendar');
 
       try {
-        // Fetch organiser's events from the backend
         const response = await fetch("http://localhost:3000/participants/reg-events", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}` // Include token for authenticated access
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`
           }
         });
 
@@ -87,35 +132,29 @@
 
         const data = await response.json();
 
-        // Map event colors based on predefined categories or dynamically
         const events = data.events.map(event => ({
-          title: `${event.event} \n ${event.time}`, // Include time in the event title
+          title: `${event.event} \n ${event.time}`,
           start: event.date,
-          className: getEventClass(event.category), // Dynamically assign class for gradient styling
+          className: getEventClass(event.category),
           allDay: true
         }));
 
-        // Render the calendar with the fetched events
         const calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: 'dayGridMonth',
-          events: events, // Dynamically set events
+          events: events,
           headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,dayGridWeek'
-          },
-          eventContent: function (info) {
-            return { html: `<div class="fc-event-title">${info.event.title}</div>` };
           }
         });
 
         calendar.render();
       } catch (error) {
-        console.error("Error fetching organiser events:", error);
+        console.error("Error fetching events:", error);
       }
     });
 
-    // Utility function to assign event classes based on category
     function getEventClass(category) {
       const categories = {
         blue: "event-blue",
@@ -124,7 +163,7 @@
         pink: "event-pink",
         purple: "event-purple"
       };
-      return categories[category] || "event-blue"; // Default gradient if no category is defined
+      return categories[category] || "event-blue";
     }
   </script>
 </body>

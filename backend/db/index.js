@@ -1,17 +1,8 @@
 require('dotenv').config();
 const mongoose=require("mongoose");
 
-const mongoUri = process.env.MONGO_URI;
+const mongoUri = process.env.MONGO_URI || "mongodb+srv://padam_007:hanumanji@cluster1.vzqhy.mongodb.net/Ideathon";
 mongoose.connect(mongoUri);
-
-const adminSchema = new mongoose.Schema({
-    username: String,
-    password: String,
-    pendingRequests: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Events"
-    }]
-  });
 
 const organiserSchema=new mongoose.Schema({
     username:String,
@@ -19,8 +10,12 @@ const organiserSchema=new mongoose.Schema({
     orgEvent: [{
         type:mongoose.Schema.Types.ObjectID,
         ref:"Events"
+    }],
+    dummyEvent: [{
+        type:mongoose.Schema.Types.ObjectID,
+        ref:"Events"
     }]
-}) 
+})
 
 const eventSchema=new mongoose.Schema({
     event:String,
@@ -37,6 +32,7 @@ const eventSchema=new mongoose.Schema({
     googleForm:String
 })
 
+
 const participantSchema=new mongoose.Schema({
     username:String,
     password:String,
@@ -45,6 +41,15 @@ const participantSchema=new mongoose.Schema({
         ref:"Events"
     }]
 }) 
+
+const adminSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+    pendingRequests: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Events"
+    }]
+});
 
 const TaskSchema = new mongoose.Schema({
     taskName: { type: String, required: true },
@@ -92,7 +97,8 @@ const Participants=mongoose.model("Participants",participantSchema);
 const Tasks = mongoose.model("Tasks",TaskSchema);
 const Feedback = mongoose.model("Feedback", feedbackSchema);
 const Chat = mongoose.model('Chat', chatSchema);
-const Admin = mongoose.model("Admin", adminSchema);
+const Admin=mongoose.model("Admin", adminSchema);
+
 
 module.exports={
     Organiser,
@@ -104,4 +110,3 @@ module.exports={
     Chat,
     Admin
 }
-

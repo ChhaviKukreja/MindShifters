@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
+  <title>Dashboard</title>
   <style>
     * {
       margin: 0;
@@ -45,6 +46,11 @@
       display: flex;
       align-items: center;
       cursor: pointer;
+    }
+
+    .sidebar ul li span {
+      margin-right: 10px;
+      font-size: 18px;
     }
 
     .sidebar ul li.active,
@@ -166,34 +172,35 @@
     /* Responsive Design */
     @media screen and (max-width: 768px) {
       .sidebar {
-          width: 100%;
-          height: auto;
-          position: relative;
+        width: 100%;
+        height: auto;
+        position: relative;
       }
 
       .main-content {
-          margin-left: 0;
+        margin-left: 0;
       }
 
       .cards {
-          flex-direction: column;
-        }
+        flex-direction: column;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="sidebar">
-    <h2>Admin Dashboard</h2>
+    <h2>Dashboard</h2>
     <ul>
-      <li class="active">Dashboard</li>
-      <li>Events</li>
-      <li>Settings</li>
+      <li class="active"><span>🏠</span> Home</li>
+      <li onclick="window.location.href='upcoming-events.html';"><span>📅</span>Events</li>
+      <li><span>⚙</span>Settings</li>
     </ul>
   </div>
 
   <div class="main-content">
     <header>
-      <h1>Pending Approvals</h1>
+      <h1>Admin</h1>
       <div class="header-buttons">
         <button class="btn btn-secondary" onclick="logout()">Logout</button>
       </div>
@@ -201,12 +208,8 @@
 
     <section class="cards">
       <div class="card">
-        <span>10</span>
-        <h3>Pending Events</h3>
-      </div>
-      <div class="card">
-        <span>5</span>
-        <h3>Approved Events</h3>
+          <span id="pending-count">0</span>
+          <h3>Pending Event Requests</h3>
       </div>
     </section>
 
@@ -216,11 +219,12 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Event Name</th>
+            <th>Event</th>
             <th>Location</th>
             <th>Date</th>
             <th>Time</th>
             <th>Actions</th>
+            <th>Student Coordinator(s)</th> 
           </tr>
         </thead>
         <tbody id="pending-events-table">
@@ -229,62 +233,106 @@
       </table>
     </section>
   </div>
-</body>
-</html>
-
 
   <script>
     // JavaScript Code
     document.addEventListener("DOMContentLoaded", () => {
+      checkAuth();
+      fetchEventCounts();
       fetchPendingEvents();
     });
+  
+    // Check Authentication
+    async function checkAuth() {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) throw new Error("No token found");
+
+        const response = await fetch("http://localhost:3000/admin/auth/check", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Authentication failed");
+        }
+      } catch (err) {
+        alert("You are not logged in. Redirecting to login page.");
+        window.location.href = "sign-in.html";
+      }
+    }
 
     // Fetch pending events from the backend
     async function fetchPendingEvents() {
       try {
+        const token = localStorage.getItem("authToken");
         const response = await fetch("http://localhost:3000/admin/pending-requests", {
           method: "GET",
-          headers: { "Content-Type": "application/json" }
-        });
-
+          headers: { "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
         if (!response.ok) throw new Error("Failed to fetch pending requests");
-
+  
         const events = await response.json();
+        console.log("here", events);
         const tableBody = document.getElementById("pending-events-table");
         tableBody.innerHTML = "";
 
+        if (events.length === 0 ) {
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;"><b>No pending requests found</b></td></tr>`;
+        return;
+      }
+  
         // Populate table with event data
-        events.events.forEach((event, index) => {
+        events.forEach((event, index) => {
+          const studentCoords = event.stuCoord.map(coord => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`).join('<br>');
+
           const row = `
-            <tr>
-              <td>${index + 1}</td>
-              <td>${event.event}</td>
-              <td>${event.location}</td>
-              <td>${new Date(event.date).toLocaleDateString()}</td>
-              <td>${event.time}</td>
-              <td>
-                <button class="action-btn" onclick="approveEvent('${event._id}')">Approve</button>
-              </td>
-            </tr>
-          `;
+              <tr id="event-row-${event._id}">
+                <td>${index + 1}</td>
+                <td>${event.event}</td>
+                <td>${event.location}</td>
+                <td>${new Date(event.date).toLocaleDateString()}</td>
+                <td>${event.time}</td>
+                <td>
+                  <button class="btn btn-primary" onclick="approveEvent('${event._id}')">Approve</button>
+                </td>
+                <td>${event.stuCoord
+                .map((coord) => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`)
+                .join("<br>")}
+                </td>
+              </tr>
+            `;
           tableBody.insertAdjacentHTML("beforeend", row);
         });
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching pending events:",error);
         alert("Error fetching pending events");
       }
     }
-
+  
     // Approve an event
     async function approveEvent(eventId) {
+      console.log("yooooooo", eventId);
       try {
+        const token = localStorage.getItem("authToken");
         const response = await fetch(`http://localhost:3000/admin/approve/${eventId}`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" }
-        });
-
+          headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response);
+  
         if (!response.ok) throw new Error("Failed to approve event");
 
+        const eventRow = document.getElementById(`event-row-${eventId}`);
+        eventRow.remove();
+  
         alert("Event approved successfully");
         fetchPendingEvents(); // Refresh the table
       } catch (error) {
@@ -293,11 +341,33 @@
       }
     }
 
+    async function fetchEventCounts() {
+  try {
+    const token = localStorage.getItem("authToken");
+    const response = await fetch("http://localhost:3000/admin/event-counts", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch event counts");
+
+    const { pendingCount } = await response.json();
+
+    // Update the card content dynamically
+    document.getElementById("pending-count").textContent = pendingCount;
+  } catch (error) {
+    console.error("Error fetching event counts:", error);
+  }
+}
+  
     // Logout function
     function logout() {
-      alert("Logging out...");
+      localStorage.removeItem("authToken");
+      alert("You have been logged out.");
       window.location.href = "sign-in.html";
     }
   </script>
 </body>
+
 </html>

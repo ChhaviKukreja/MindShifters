@@ -339,6 +339,7 @@
 
                 const result = await response.json();
                 alert("Task updated successfully!");
+                location.reload();
             } catch (error) {
                 console.error("Error updating task:", error);
                 alert("Error updating task. Check console for details.");

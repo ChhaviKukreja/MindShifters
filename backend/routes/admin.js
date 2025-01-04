@@ -1,8 +1,8 @@
 const cors = require("cors");
 const express = require("express");
-const organiserMiddleware = require("../middleware/organiser");
+const adminMiddleware = require("../middleware/admin");
 const router = express.Router();
-const { Organiser, Events, Tasks, Announcement, Feedback, Admin } = require("../db");
+const { Organiser, Events, Tasks, Announcement, Feedback, Admin, NewSchema } = require("../db");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
 const { z } = require("zod");
@@ -42,15 +42,15 @@ const signupSchema = z.object({
     try {
       const { username, password } = signupSchema.parse(req.body);
   
-      const existingOrganiser = await Organiser.findOne({ username });
-      if (existingOrganiser) {
-        return res.status(400).json({ msg: "Organiser already exists" });
+      const existingAdmin = await Admin.findOne({ username });
+      if (existingAdmin) {
+        return res.status(400).json({ msg: "Admin already exists" });
       }
   
-      await Organiser.create({ username, password });
+      await Admin.create({ username, password });
       const token = jwt.sign({ username }, JWT_SECRET);
   
-      res.json({ msg: "Organiser created successfully", token: token });
+      res.json({ msg: "Admin created successfully", token: token });
   
     } catch (error) {
       res.status(400).json({ error: error.errors || error.message });
@@ -61,8 +61,8 @@ const signupSchema = z.object({
     try {
       const { username, password } = signinSchema.parse(req.body);
   
-      const organiser = await Organiser.findOne({ username, password });
-      if (organiser) {
+      const admin = await Admin.findOne({ username, password });
+      if (admin) {
         const token = jwt.sign({ username }, JWT_SECRET);
         res.json({ token });
       } else {
@@ -73,11 +73,12 @@ const signupSchema = z.object({
     }
   });
   
-  router.get("/auth/check", organiserMiddleware, (req, res) => {
+  router.get("/auth/check", adminMiddleware, (req, res) => {
     res.status(200).json({ username: req.username }); // Send back the authenticated user's details
   });
 
-  router.get("/pending-requests", async (req, res) => {
+  router.get("/pending-requests", adminMiddleware, async (req, res) => {
+    console.log("hello");
     try {
       const admin = await Admin.findOne().populate("pendingRequests");
       res.json(admin.pendingRequests);
@@ -86,32 +87,71 @@ const signupSchema = z.object({
       res.status(500).json({ message: "Failed to fetch pending requests" });
     }
   });
+
+  // Get counts of pending and approved events
+router.get("/event-counts", adminMiddleware, async (req, res) => {
+  try {
+    const admin = await Admin.findOne().populate("pendingRequests");
+    const pendingCount = admin.pendingRequests.length;
+
+    res.status(200).json({
+      pendingCount
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch event counts" });
+  }
+});
+
   
   // Approve event
-  router.post("/approve/:eventId", async (req, res) => {
-    const { eventId } = req.params;
-  
-    try {
-      // Find and remove the event from the admin's pending list
-      const admin = await Admin.findOne();
-      admin.pendingRequests = admin.pendingRequests.filter(
+router.post("/approve/:eventId", adminMiddleware, async (req, res) => {
+  console.log("inside approve");
+  const { eventId } = req.params;
+
+  try {
+    // Find and remove the event from the admin's pending list
+    const admin = await Admin.findOne();
+    console.log("Inside post", admin);
+    admin.pendingRequests = admin.pendingRequests.filter(
+      (id) => id.toString() !== eventId
+    );
+    await admin.save();
+
+    //Add the event to the respective organizer's approved events
+    const event = await Events.findById(eventId);
+    console.log(event);
+    const organizer = await Organiser.findOne({ dummyEvent: eventId });
+    console.log(organizer);
+    if (organizer) {
+      organizer.orgEvent.push(eventId);
+      organizer.dummyEvent = organizer.dummyEvent.filter(
         (id) => id.toString() !== eventId
       );
-      await admin.save();
-  
-      // Add the event to the respective organizer's approved events
-      const event = await Event.findById(eventId);
-      const organizer = await Organiser.findOne({ orgEvent: eventId });
-      if (organizer) {
-        organizer.orgEvent.push(eventId);
-        await organizer.save();
-      }
-  
-      res.status(200).json({ message: "Event approved successfully" });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Failed to approve event" });
+      await organizer.save();
     }
-  });
-  
+
+    res.status(200).json({ message: "Event approved successfully", eventId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to approve event" });
+  }
+});
+
+router.get("/all-events", async (req, res) => {
+  console.log("Route /all-events called");
+  try {
+    const events = await Events.find(); // Replace 'Event' with your actual event model name if different
+
+    if (events.length === 0) {
+      return res.status(404).json({ message: "No events found in the database" });
+    }
+
+    res.status(200).json({ events });
+  } catch (error) {
+    console.error("Error fetching all events:", error);
+    res.status(500).json({ message: "Error fetching events", error });
+  }
+});
+
   module.exports = router;

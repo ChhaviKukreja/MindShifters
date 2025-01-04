@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
-  <link rel="stylesheet" href="d.css">
+  <link rel="stylesheet" href="participant.css">
 </head>
 <body>
   <!-- Sidebar -->
@@ -13,8 +13,8 @@
     <ul>
       <li class="active"><span>🏠</span> Home</li>
       <!-- <li onclick="window.location.href='events.html';"><span>📅</span> Events</li> -->
-      <li onclick="window.location.href='feedback.html';"><span>📩</span> feedback form </li>
-      <li onclick="window.location.href='templates/certificate.html';"><span>📩</span> Download Certificate </li>
+      <li onclick="window.location.href='feedback.html';"><span>📩</span> Feedback Form </li>
+      <li onclick="window.location.href='certificate.html';"><span>📩</span> Download Certificate </li>
       <li onclick="window.location.href='calendar.html';"><span>📆</span> Calendars</li>
       <li><span>⚙</span> Settings</li>
     </ul>
@@ -26,14 +26,14 @@
     <header>
       <h1>Participant</h1>
       <div class="header-buttons">
-        <button class="btn btn-primary" onclick="window.location.href='about.html';">About Us</button>
+        <button class="btn btn-primary" onclick="window.location.href='about-us.html';">About Us</button>
         <button class="btn btn-secondary" onclick="logout();">Log out</button>
       </div>
     </header>
 
     <!-- Cards Section -->
     <div class="cards">
-      <div class="card" onclick="window.location.href='events.html';" style="cursor: pointer;">
+      <div class="card" onclick="window.location.href='upcoming-events.html';" style="cursor: pointer;">
         <span>📅</span>
         <h3>Upcoming Events</h3>
       </div>
@@ -148,7 +148,7 @@
     function logout() {
       localStorage.removeItem("authToken");
       alert("You have been logged out.");
-      window.location.href = "sign-in.html";
+      window.location.href = "/frontend/sign-in.html";
     }
 
     // Sidebar toggle functionality
