@@ -1,0 +1,16 @@
+{
+    "rewrites": [
+      {
+        "source": "/api/:path*",
+        "destination": "https://event-management-portal-chi.vercel.app/:path*"
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/",
+        "destination": "/sign-in.html",
+        "permanent": true
+      }
+    ]
+  }
+  
