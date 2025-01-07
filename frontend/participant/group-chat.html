@@ -756,9 +756,18 @@
 
         // Send a new message
         async function sendMessage(eventId, message) {
+            console.log("Inside funk");
             try {
+                console.log("Inside try");
                 const usernameLong = localStorage.getItem("username");
+                console.log("Username long", usernameLong);
                 const usernameShort = usernameLong.split("@");
+                console.log("usernameShort", usernameShort);
+                if (usernameShort.length !== 2 || !usernameShort[0] || !usernameShort[1]) {
+                    console.error("Invalid email format.");
+                    alert("Please enter a valid email address.");
+                    return;
+                }
                 const username = usernameShort[0];
                 const domain = usernameShort[1];
 
