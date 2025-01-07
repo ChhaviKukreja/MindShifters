@@ -715,7 +715,7 @@
             const messages = await fetchMessages(eventId);
             messages.forEach(msg => {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = msg.sender === localStorage.getItem("username") ? "self" : "other";
+                messageDiv.className = msg.sender === localStorage.getItem("authToken") ? "self" : "other";
 
                 const senderSpan = document.createElement('span');
                 senderSpan.className = "sender";
@@ -759,7 +759,7 @@
             console.log("Inside funk");
             try {
                 console.log("Inside try");
-                const usernameLong = localStorage.getItem("username");
+                const usernameLong = localStorage.getItem("authToken");
                 console.log("Username long", usernameLong);
                 const usernameShort = usernameLong.split("@");
                 console.log("usernameShort", usernameShort);
