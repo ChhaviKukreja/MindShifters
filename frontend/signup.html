@@ -205,11 +205,11 @@
 
                         // Redirect to respective dashboard
                         if (role === "admin") {
-                            window.location.href = "../frontend/admin/admin-dashboard.html";
+                            window.location.href = "../admin/admin-dashboard.html";
                         } else if (role === "organiser") {
-                            window.location.href = "../frontend/organiser/organiser-dashboard.html";
+                            window.location.href = "../organiser/organiser-dashboard.html";
                         } else if (role === "participants") {
-                            window.location.href = "../frontend/participant/participant-dashboard.html";
+                            window.location.href = "../participant/participant-dashboard.html";
                         }
                     } else {
                         alert("Signup failed: " + (data.msg || "Unknown error"));

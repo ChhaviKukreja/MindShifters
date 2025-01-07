@@ -1,814 +1,811 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Chat Dashboard</title>
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=mood" />
-    <style>
-        /* CSS for the chat dashboard */
-        /* CSS for the Telegram-style chat dashboard */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #edeef0;
-            background-image: url(chator.jpg);
-        }
-
-        .dashboard {
-            width: 100vh;
-            height: 80h;
-            background: white;
-            border-radius: 45px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        h1 {
-
-            font-size: 1.5rem;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            background: #5682a3;
-            color: rgb(255, 255, 255);
-            font-weight: 500;
-            border-radius: 12px 12px 0 0;
-        }
-
-        .event-selector {
-            margin: 0;
-            padding: 12px 16px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e6e6e6;
-        }
-
-        .event-selector label {
-            display: block;
-            margin-bottom: 8px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        #events {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #dfe1e5;
-            border-radius: 8px;
-            font-size: 14px;
-            background: white;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        #events:focus {
-            border-color: #5682a3;
-        }
-
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 400px;
-            border-radius: 0 0 12px 12px;
-            overflow: hidden;
-            background: #fff;
-        }
-
-        .chat-box {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            background: #e6ebee;
-        }
-
-        .chat-box div {
-            margin-bottom: 12px;
-            padding: 10px 14px;
-            border-radius: 12px;
-            max-width: 80%;
-            position: relative;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        .chat-box .self {
-            background: #effdde;
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-box .other {
-            background: white;
-            margin-right: auto;
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-box .sender {
-            font-size: 13px;
-            color: #5682a3;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .chat-box .timestamp {
-            font-size: 11px;
-            color: #8e8e8e;
-            margin-top: 4px;
-            text-align: right;
-        }
-
-        .chat-box p {
-            margin: 0;
-            line-height: 1.4;
-            color: #333;
-        }
-
-        .chat-input {
-            display: flex;
-            gap: 8px;
-            padding: 12px;
-            background: #fff;
-            border-top: 1px solid #e6e6e6;
-            position: relative;
-        }
-
-        #message {
-            flex: 1;
-            padding: 10px 16px;
-            padding-left: 45px;
-            border: 1px solid #dfe1e5;
-            border-radius: 20px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        #message:focus {
-            border-color: #5682a3;
-        }
-
-        #send-button {
-            padding: 8px 20px;
-            background: #5682a3;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.2s;
-        }
-
-        #send-button:hover {
-            background: #476b8f;
-        }
-
-        .emoji-trigger {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 50%;
-            transition: background-color 0.2s;
-        }
-
-        .emoji-trigger:hover {
-            background-color: #f0f2f5;
-        }
-
-        .emoji-picker {
-            position: absolute;
-            bottom: 100%;
-            left: 12px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            padding: 12px;
-            display: none;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
-            width: 280px;
-            margin-bottom: 8px;
-        }
-
-        .emoji-picker.active {
-            display: grid;
-        }
-
-        .emoji-item {
-            font-size: 20px;
-            padding: 8px;
-            cursor: pointer;
-            text-align: center;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .emoji-item:hover {
-            background-color: #f0f2f5;
-        }
-
-        .chat-box::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-box::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-box::-webkit-scrollbar-thumb {
-            background: #bcc4c9;
-            border-radius: 3px;
-        }
-
-        .chat-box::-webkit-scrollbar-thumb:hover {
-            background: #a3abb1;
-        }
-
-        /* Theme variables */
-        :root {
-            /* Light theme (default) */
-            --bg-color: #edeef0;
-            --header-bg: #5e90b5;
-            --chat-bg: #e6ebee;
-            --message-bg: #fff;
-            --self-message-bg: #effdde;
-            --text-color: #333;
-            --secondary-text: #8e8e8e;
-            --border-color: #e6e6e6;
-            --input-bg: #fff;
-            --input-border: #dfe1e5;
-            --button-bg: #5682a3;
-            --button-hover: #476b8f;
-            --emoji-hover: #f0f2f5;
-            --scrollbar-thumb: #bcc4c9;
-            --scrollbar-hover: #a3abb1;
-            --picker-bg: #fff;
-            --picker-shadow: rgba(0, 0, 0, 0.15);
-        }
-
-        /* Dark theme */
-        [data-theme="dark"] {
-            --bg-color: #0f0f0f;
-            --header-bg: #232323;
-            --chat-bg: #1c1c1c;
-            --message-bg: #2c2c2c;
-            --self-message-bg: #2b4638;
-            --text-color: #e0e0e0;
-            --secondary-text: #a0a0a0;
-            --border-color: #2d2d2d;
-            --input-bg: #2c2c2c;
-            --input-border: #3d3d3d;
-            --button-bg: #5682a3;
-            --button-hover: #476b8f;
-            --emoji-hover: #3d3d3d;
-            --scrollbar-thumb: #404040;
-            --scrollbar-hover: #4a4a4a;
-            --picker-bg: #2c2c2c;
-            --picker-shadow: rgba(0, 0, 0, 0.3);
-        }
-
-        /* Theme switcher styles */
-        .theme-switch {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .theme-switch button {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 50%;
-            color: white;
-            transition: transform 0.2s ease;
-        }
-
-        .theme-switch button:hover {
-            transform: scale(1.1);
-        }
-
-        /* Apply theme variables to existing styles */
-        body {
-            background-color: var(--bg-color);
-        }
-
-        .dashboard {
-            background: var(--message-bg);
-        }
-
-        h1 {
-            background: var(--header-bg);
-            color: var(--text-color);
-        }
-
-        .event-selector {
-            background: var(--message-bg);
-            border-bottom-color: var(--border-color);
-        }
-
-        .event-selector label {
-            color: var(--secondary-text);
-        }
-
-        #events {
-            background: var(--input-bg);
-            border-color: var(--input-border);
-            color: var(--text-color);
-        }
-
-        #events:focus {
-            border-color: var(--button-bg);
-        }
-
-        .chat-container {
-            background: var(--message-bg);
-        }
-
-        .chat-box {
-            background: var(--chat-bg);
-        }
-
-        .chat-box div {
-            color: var(--text-color);
-        }
-
-        .chat-box .self {
-            background: var(--self-message-bg);
-        }
-
-        .chat-box .other {
-            background: var(--message-bg);
-        }
-
-        .chat-box .sender {
-            color: var(--button-bg);
-        }
-
-        .chat-box .timestamp {
-            color: var(--secondary-text);
-        }
-
-        .chat-box p {
-            color: var(--text-color);
-        }
-
-        .chat-input {
-            background: var(--message-bg);
-            border-top-color: var(--border-color);
-        }
-
-        #message {
-            background: var(--input-bg);
-            border-color: var(--input-border);
-            color: var(--text-color);
-        }
-
-        #message:focus {
-            border-color: var(--button-bg);
-        }
-
-        #send-button {
-            background: var(--button-bg);
-        }
-
-        #send-button:hover {
-            background: var(--button-hover);
-        }
-
-        .emoji-trigger {
-            color: var(--text-color);
-        }
-
-        .emoji-trigger:hover {
-            background-color: var(--emoji-hover);
-        }
-
-        .emoji-picker {
-            background: var(--picker-bg);
-            box-shadow: 0 4px 20px var(--picker-shadow);
-        }
-
-        .emoji-item:hover {
-            background-color: var(--emoji-hover);
-        }
-
-        .chat-box::-webkit-scrollbar-thumb {
-            background: var(--scrollbar-thumb);
-        }
-
-        .chat-box::-webkit-scrollbar-thumb:hover {
-            background: var(--scrollbar-hover);
-        }
-
-        /* Transition for theme switch */
-        * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .theme-switch {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: white;
-            border: 2px solid #000;
-            border-radius: 20px;
-            padding: 4px 8px;
-        }
-
-        .theme-switch button {
-            background: none;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 50%;
-            transition: transform 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .theme-switch button:hover {
-            transform: scale(1.1);
-            background-color: #f5f5f5;
-        }
-
-        /* Add separator between buttons */
-        .theme-switch button:first-child {
-            border-right: 1px solid #e0e0e0;
-            padding-right: 8px;
-        }
-
-        .theme-switch button:last-child {
-            padding-left: 8px;
-        }
-
-        .event-selector {
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .event-selector label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 1.1em;
-        }
-
-        select {
-            appearance: none;
-            /* Removes default browser styling */
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            background-color: white;
-            cursor: pointer;
-            color: #333;
-            transition: all 0.3s ease;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 15px;
-            padding-right: 45px;
-        }
-
-        select:hover {
-            border-color: #5c2bd5;
-            box-shadow: 0 0 10px rgba(92, 43, 213, 0.1);
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #5c2bd5;
-            box-shadow: 0 0 15px rgba(92, 43, 213, 0.2);
-            transform: translateY(-2px);
-        }
-
-        /* Style for dropdown options */
-        select option {
-            padding: 15px;
-            font-size: 16px;
-            background-color: white;
-            color: #333;
-        }
-
-        select option:hover {
-            background-color: #f0f0f0;
-        }
-
-        /* For disabled state */
-        select:disabled {
-            background-color: #f5f5f5;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* Style for the placeholder option */
-        select option[value=""] {
-            color: #999;
-        }
-
-        /* Add a subtle animation when opening */
-        select::-ms-expand {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            select {
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Event Chat Dashboard</title>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=mood" />
+        <style>
+            /* CSS for the chat dashboard */
+            /* CSS for the Telegram-style chat dashboard */
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background-color: #edeef0;
+                background-image: url(chator.jpg);
+            }
+
+            .dashboard {
+                width: 100vh;
+                height: 80h;
+                background: white;
+                border-radius: 45px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+
+            h1 {
+
+                font-size: 1.5rem;
+                text-align: center;
+                margin: 0;
+                padding: 20px;
+                background: #5682a3;
+                color: rgb(255, 255, 255);
+                font-weight: 500;
+                border-radius: 12px 12px 0 0;
+            }
+
+            .event-selector {
+                margin: 0;
+                padding: 12px 16px;
+                background: #f8f9fa;
+                border-bottom: 1px solid #e6e6e6;
+            }
+
+            .event-selector label {
+                display: block;
+                margin-bottom: 8px;
+                color: #666;
                 font-size: 14px;
+            }
+
+            #events {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #dfe1e5;
+                border-radius: 8px;
+                font-size: 14px;
+                background: white;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+            #events:focus {
+                border-color: #5682a3;
+            }
+
+            .chat-container {
+                display: flex;
+                flex-direction: column;
+                height: 400px;
+                border-radius: 0 0 12px 12px;
+                overflow: hidden;
+                background: #fff;
+            }
+
+            .chat-box {
+                flex: 1;
+                overflow-y: auto;
+                padding: 16px;
+                background: #e6ebee;
+            }
+
+            .chat-box div {
+                margin-bottom: 12px;
+                padding: 10px 14px;
+                border-radius: 12px;
+                max-width: 80%;
+                position: relative;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            }
+
+            .chat-box .self {
+                background: #effdde;
+                margin-left: auto;
+                border-bottom-right-radius: 4px;
+            }
+
+            .chat-box .other {
+                background: white;
+                margin-right: auto;
+                border-bottom-left-radius: 4px;
+            }
+
+            .chat-box .sender {
+                font-size: 13px;
+                color: #5682a3;
+                font-weight: 500;
+                margin-bottom: 4px;
+            }
+
+            .chat-box .timestamp {
+                font-size: 11px;
+                color: #8e8e8e;
+                margin-top: 4px;
+                text-align: right;
+            }
+
+            .chat-box p {
+                margin: 0;
+                line-height: 1.4;
+                color: #333;
+            }
+
+            .chat-input {
+                display: flex;
+                gap: 8px;
                 padding: 12px;
+                background: #fff;
+                border-top: 1px solid #e6e6e6;
+                position: relative;
             }
-        }
-    </style>
-</head>
 
-<body>
-    <div class="dashboard">
-        <h1>Event Chat Dashboard</h1>
-        <div class="flex-container">
-            <div class="theme-switch">
-                <button id="light-theme">☀</button>
-                <button id="dark-theme">🌙</button>
-            </div>
-        </div>
-        <div class="event-selector">
-            <label for="events">Select an Event:</label>
-            <select id="events">
-                <option value="">Loading events...</option>
-            </select>
-        </div>
-        <div class="chat-container">
-            <div id="chat-box" class="chat-box">
-                <!-- Chat messages will appear here -->
-            </div>
-            <div class="chat-input">
-                <button class="emoji-trigger"><span class="material-symbols-outlined">
-                        mood
-                    </span></button>
-                <div class="emoji-picker">
-                    <div class="emoji-item">😊</div>
-                    <div class="emoji-item">😂</div>
-                    <div class="emoji-item">🥰</div>
-                    <div class="emoji-item">😎</div>
-                    <div class="emoji-item">😍</div>
-                    <div class="emoji-item">🤔</div>
-                    <div class="emoji-item">😅</div>
-                    <div class="emoji-item">😭</div>
-                    <div class="emoji-item">😤</div>
-                    <div class="emoji-item">🥺</div>
-                    <div class="emoji-item">👍</div>
-                    <div class="emoji-item">👎</div>
-                    <div class="emoji-item">❤</div>
-                    <div class="emoji-item">🎉</div>
-                    <div class="emoji-item">🔥</div>
-                    <div class="emoji-item">✨</div>
-                    <div class="emoji-item">🙏</div>
-                    <div class="emoji-item">💯</div>
-                </div>
-                <input type="text" id="message" placeholder="Type your message...">
-                <button id="send-button">Send</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="config.js"></script>
-
-    <script>
-        // Theme switcher functionality
-        const lightTheme = document.getElementById('light-theme');
-        const darkTheme = document.getElementById('dark-theme');
-
-        lightTheme.addEventListener('click', () => {
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
-        });
-
-        darkTheme.addEventListener('click', () => {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        });
-
-        // Check for saved theme preference
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-
-
-        const emojiTrigger = document.querySelector('.emoji-trigger');
-        const emojiPicker = document.querySelector('.emoji-picker');
-        const messageInput = document.querySelector('#message');
-
-        emojiTrigger.addEventListener('click', () => {
-            emojiPicker.classList.toggle('active');
-        });
-
-        // Close emoji picker when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!emojiPicker.contains(e.target) && !emojiTrigger.contains(e.target)) {
-                emojiPicker.classList.remove('active');
+            #message {
+                flex: 1;
+                padding: 10px 16px;
+                padding-left: 45px;
+                border: 1px solid #dfe1e5;
+                border-radius: 20px;
+                font-size: 14px;
+                outline: none;
+                transition: border-color 0.2s;
             }
-        });
 
-        // Insert emoji into input field
-        const emojiItems = document.querySelectorAll('.emoji-item');
-        emojiItems.forEach(emoji => {
-            emoji.addEventListener('click', () => {
-                messageInput.value += emoji.textContent;
-                emojiPicker.classList.remove('active');
-                messageInput.focus();
-            });
-        });
-        const eventsDropdown = document.getElementById('events');
-        const chatBox = document.getElementById('chat-box');
-        // const messageInput = document.getElementById('message');
-        const sendButton = document.getElementById('send-button');
+            #message:focus {
+                border-color: #5682a3;
+            }
 
-        let currentEventId = null;
-        let pollInterval = null;
+            #send-button {
+                padding: 8px 20px;
+                background: #5682a3;
+                color: white;
+                border: none;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: background 0.2s;
+            }
 
-        // Fetch registered events for the participant
-        async function fetchRegisteredEvents() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/participants/reg-events`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-                    },
-                });
+            #send-button:hover {
+                background: #476b8f;
+            }
 
-                if (response.ok) {
-                    const events = await response.json();
-                    populateEvents(events);
-                } else {
-                    console.error("Failed to fetch registered events");
+            .emoji-trigger {
+                position: absolute;
+                left: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 20px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 5px;
+                border-radius: 50%;
+                transition: background-color 0.2s;
+            }
+
+            .emoji-trigger:hover {
+                background-color: #f0f2f5;
+            }
+
+            .emoji-picker {
+                position: absolute;
+                bottom: 100%;
+                left: 12px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                padding: 12px;
+                display: none;
+                grid-template-columns: repeat(6, 1fr);
+                gap: 8px;
+                width: 280px;
+                margin-bottom: 8px;
+            }
+
+            .emoji-picker.active {
+                display: grid;
+            }
+
+            .emoji-item {
+                font-size: 20px;
+                padding: 8px;
+                cursor: pointer;
+                text-align: center;
+                border-radius: 4px;
+                transition: background-color 0.2s;
+            }
+
+            .emoji-item:hover {
+                background-color: #f0f2f5;
+            }
+
+            .chat-box::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .chat-box::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .chat-box::-webkit-scrollbar-thumb {
+                background: #bcc4c9;
+                border-radius: 3px;
+            }
+
+            .chat-box::-webkit-scrollbar-thumb:hover {
+                background: #a3abb1;
+            }
+
+            /* Theme variables */
+            :root {
+                /* Light theme (default) */
+                --bg-color: #edeef0;
+                --header-bg: #5e90b5;
+                --chat-bg: #e6ebee;
+                --message-bg: #fff;
+                --self-message-bg: #effdde;
+                --text-color: #333;
+                --secondary-text: #8e8e8e;
+                --border-color: #e6e6e6;
+                --input-bg: #fff;
+                --input-border: #dfe1e5;
+                --button-bg: #5682a3;
+                --button-hover: #476b8f;
+                --emoji-hover: #f0f2f5;
+                --scrollbar-thumb: #bcc4c9;
+                --scrollbar-hover: #a3abb1;
+                --picker-bg: #fff;
+                --picker-shadow: rgba(0, 0, 0, 0.15);
+            }
+
+            /* Dark theme */
+            [data-theme="dark"] {
+                --bg-color: #0f0f0f;
+                --header-bg: #232323;
+                --chat-bg: #1c1c1c;
+                --message-bg: #2c2c2c;
+                --self-message-bg: #2b4638;
+                --text-color: #e0e0e0;
+                --secondary-text: #a0a0a0;
+                --border-color: #2d2d2d;
+                --input-bg: #2c2c2c;
+                --input-border: #3d3d3d;
+                --button-bg: #5682a3;
+                --button-hover: #476b8f;
+                --emoji-hover: #3d3d3d;
+                --scrollbar-thumb: #404040;
+                --scrollbar-hover: #4a4a4a;
+                --picker-bg: #2c2c2c;
+                --picker-shadow: rgba(0, 0, 0, 0.3);
+            }
+
+            /* Theme switcher styles */
+            .theme-switch {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .theme-switch button {
+                background: none;
+                border: none;
+                font-size: 20px;
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 50%;
+                color: white;
+                transition: transform 0.2s ease;
+            }
+
+            .theme-switch button:hover {
+                transform: scale(1.1);
+            }
+
+            /* Apply theme variables to existing styles */
+            body {
+                background-color: var(--bg-color);
+            }
+
+            .dashboard {
+                background: var(--message-bg);
+            }
+
+            h1 {
+                background: var(--header-bg);
+                color: var(--text-color);
+            }
+
+            .event-selector {
+                background: var(--message-bg);
+                border-bottom-color: var(--border-color);
+            }
+
+            .event-selector label {
+                color: var(--secondary-text);
+            }
+
+            #events {
+                background: var(--input-bg);
+                border-color: var(--input-border);
+                color: var(--text-color);
+            }
+
+            #events:focus {
+                border-color: var(--button-bg);
+            }
+
+            .chat-container {
+                background: var(--message-bg);
+            }
+
+            .chat-box {
+                background: var(--chat-bg);
+            }
+
+            .chat-box div {
+                color: var(--text-color);
+            }
+
+            .chat-box .self {
+                background: var(--self-message-bg);
+            }
+
+            .chat-box .other {
+                background: var(--message-bg);
+            }
+
+            .chat-box .sender {
+                color: var(--button-bg);
+            }
+
+            .chat-box .timestamp {
+                color: var(--secondary-text);
+            }
+
+            .chat-box p {
+                color: var(--text-color);
+            }
+
+            .chat-input {
+                background: var(--message-bg);
+                border-top-color: var(--border-color);
+            }
+
+            #message {
+                background: var(--input-bg);
+                border-color: var(--input-border);
+                color: var(--text-color);
+            }
+
+            #message:focus {
+                border-color: var(--button-bg);
+            }
+
+            #send-button {
+                background: var(--button-bg);
+            }
+
+            #send-button:hover {
+                background: var(--button-hover);
+            }
+
+            .emoji-trigger {
+                color: var(--text-color);
+            }
+
+            .emoji-trigger:hover {
+                background-color: var(--emoji-hover);
+            }
+
+            .emoji-picker {
+                background: var(--picker-bg);
+                box-shadow: 0 4px 20px var(--picker-shadow);
+            }
+
+            .emoji-item:hover {
+                background-color: var(--emoji-hover);
+            }
+
+            .chat-box::-webkit-scrollbar-thumb {
+                background: var(--scrollbar-thumb);
+            }
+
+            .chat-box::-webkit-scrollbar-thumb:hover {
+                background: var(--scrollbar-hover);
+            }
+
+            /* Transition for theme switch */
+            * {
+                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            }
+
+            .theme-switch {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                background: white;
+                border: 2px solid #000;
+                border-radius: 20px;
+                padding: 4px 8px;
+            }
+
+            .theme-switch button {
+                background: none;
+                border: none;
+                font-size: 18px;
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 50%;
+                transition: transform 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .theme-switch button:hover {
+                transform: scale(1.1);
+                background-color: #f5f5f5;
+            }
+
+            /* Add separator between buttons */
+            .theme-switch button:first-child {
+                border-right: 1px solid #e0e0e0;
+                padding-right: 8px;
+            }
+
+            .theme-switch button:last-child {
+                padding-left: 8px;
+            }
+
+            .event-selector {
+                margin: 20px 0;
+                position: relative;
+            }
+
+            .event-selector label {
+                display: block;
+                margin-bottom: 8px;
+                color: #333;
+                font-weight: 500;
+                font-size: 1.1em;
+            }
+
+            select {
+                appearance: none;
+                /* Removes default browser styling */
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                width: 100%;
+                padding: 15px;
+                font-size: 16px;
+                border: 2px solid #e0e0e0;
+                border-radius: 10px;
+                background-color: white;
+                cursor: pointer;
+                color: #333;
+                transition: all 0.3s ease;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 15px center;
+                background-size: 15px;
+                padding-right: 45px;
+            }
+
+            select:hover {
+                border-color: #5c2bd5;
+                box-shadow: 0 0 10px rgba(92, 43, 213, 0.1);
+            }
+
+            select:focus {
+                outline: none;
+                border-color: #5c2bd5;
+                box-shadow: 0 0 15px rgba(92, 43, 213, 0.2);
+                transform: translateY(-2px);
+            }
+
+            /* Style for dropdown options */
+            select option {
+                padding: 15px;
+                font-size: 16px;
+                background-color: white;
+                color: #333;
+            }
+
+            select option:hover {
+                background-color: #f0f0f0;
+            }
+
+            /* For disabled state */
+            select:disabled {
+                background-color: #f5f5f5;
+                cursor: not-allowed;
+                opacity: 0.7;
+            }
+
+            /* Style for the placeholder option */
+            select option[value=""] {
+                color: #999;
+            }
+
+            /* Add a subtle animation when opening */
+            select::-ms-expand {
+                display: none;
+            }
+
+            @media (max-width: 768px) {
+                select {
+                    font-size: 14px;
+                    padding: 12px;
                 }
-            } catch (error) {
-                console.error("Error fetching events:", error);
             }
-        }
+        </style>
+    </head>
 
-        // Populate events dropdown
-        function populateEvents(eventsData) {
-            eventsDropdown.innerHTML = ""; // Clear the dropdown
-            if (eventsData.events && eventsData.events.length > 0) {
-                eventsData.events.forEach((event) => {
-                    const option = document.createElement('option');
-                    option.value = event._id;
-                    option.textContent = event.event;
-                    eventsDropdown.appendChild(option);
+    <body>
+        <div class="dashboard">
+            <h1>Event Chat Dashboard</h1>
+            <div class="flex-container">
+                <div class="theme-switch">
+                    <button id="light-theme">☀</button>
+                    <button id="dark-theme">🌙</button>
+                </div>
+            </div>
+            <div class="event-selector">
+                <label for="events">Select an Event:</label>
+                <select id="events">
+                    <option value="">Loading events...</option>
+                </select>
+            </div>
+            <div class="chat-container">
+                <div id="chat-box" class="chat-box">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="chat-input">
+                    <button class="emoji-trigger"><span class="material-symbols-outlined">
+                            mood
+                        </span></button>
+                    <div class="emoji-picker">
+                        <div class="emoji-item">😊</div>
+                        <div class="emoji-item">😂</div>
+                        <div class="emoji-item">🥰</div>
+                        <div class="emoji-item">😎</div>
+                        <div class="emoji-item">😍</div>
+                        <div class="emoji-item">🤔</div>
+                        <div class="emoji-item">😅</div>
+                        <div class="emoji-item">😭</div>
+                        <div class="emoji-item">😤</div>
+                        <div class="emoji-item">🥺</div>
+                        <div class="emoji-item">👍</div>
+                        <div class="emoji-item">👎</div>
+                        <div class="emoji-item">❤</div>
+                        <div class="emoji-item">🎉</div>
+                        <div class="emoji-item">🔥</div>
+                        <div class="emoji-item">✨</div>
+                        <div class="emoji-item">🙏</div>
+                        <div class="emoji-item">💯</div>
+                    </div>
+                    <input type="text" id="message" placeholder="Type your message...">
+                    <button id="send-button">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Theme switcher functionality
+            const lightTheme = document.getElementById('light-theme');
+            const darkTheme = document.getElementById('dark-theme');
+
+            lightTheme.addEventListener('click', () => {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            });
+
+            darkTheme.addEventListener('click', () => {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            });
+
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+
+            const emojiTrigger = document.querySelector('.emoji-trigger');
+            const emojiPicker = document.querySelector('.emoji-picker');
+            const messageInput = document.querySelector('#message');
+
+            emojiTrigger.addEventListener('click', () => {
+                emojiPicker.classList.toggle('active');
+            });
+
+            // Close emoji picker when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!emojiPicker.contains(e.target) && !emojiTrigger.contains(e.target)) {
+                    emojiPicker.classList.remove('active');
+                }
+            });
+
+            // Insert emoji into input field
+            const emojiItems = document.querySelectorAll('.emoji-item');
+            emojiItems.forEach(emoji => {
+                emoji.addEventListener('click', () => {
+                    messageInput.value += emoji.textContent;
+                    emojiPicker.classList.remove('active');
+                    messageInput.focus();
                 });
+            });
+            const eventsDropdown = document.getElementById('events');
+            const chatBox = document.getElementById('chat-box');
+            // const messageInput = document.getElementById('message');
+            const sendButton = document.getElementById('send-button');
 
-                // Render chat for the first event by default
-                currentEventId = eventsData.events[0]._id;
-                renderChat(currentEventId);
-                startPolling();
-            } else {
-                const noEventsOption = document.createElement('option');
-                noEventsOption.textContent = "No events registered";
-                noEventsOption.disabled = true;
-                eventsDropdown.appendChild(noEventsOption);
+            let currentEventId = null;
+            let pollInterval = null;
+
+            // Fetch registered events for the participant
+            async function fetchRegisteredEvents() {
+                try {
+                    const response = await fetch("http://localhost:3000/participants/reg-events", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                        },
+                    });
+
+                    if (response.ok) {
+                        const events = await response.json();
+                        populateEvents(events);
+                    } else {
+                        console.error("Failed to fetch registered events");
+                    }
+                } catch (error) {
+                    console.error("Error fetching events:", error);
+                }
             }
-        }
 
-        // Fetch chat messages for an event
-        async function fetchMessages(eventId) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/participants/chats/${eventId}`);
-                if (response.ok) {
-                    return await response.json();
+            // Populate events dropdown
+            function populateEvents(eventsData) {
+                eventsDropdown.innerHTML = ""; // Clear the dropdown
+                if (eventsData.events && eventsData.events.length > 0) {
+                    eventsData.events.forEach((event) => {
+                        const option = document.createElement('option');
+                        option.value = event._id;
+                        option.textContent = event.event;
+                        eventsDropdown.appendChild(option);
+                    });
+
+                    // Render chat for the first event by default
+                    currentEventId = eventsData.events[0]._id;
+                    renderChat(currentEventId);
+                    startPolling();
                 } else {
-                    console.error("Failed to fetch messages");
+                    const noEventsOption = document.createElement('option');
+                    noEventsOption.textContent = "No events registered";
+                    noEventsOption.disabled = true;
+                    eventsDropdown.appendChild(noEventsOption);
+                }
+            }
+
+            // Fetch chat messages for an event
+            async function fetchMessages(eventId) {
+                try {
+                    const response = await fetch(`http://localhost:3000/participants/chats/${eventId}`);
+                    if (response.ok) {
+                        return await response.json();
+                    } else {
+                        console.error("Failed to fetch messages");
+                        return [];
+                    }
+                } catch (error) {
+                    console.error("Error fetching messages:", error);
                     return [];
                 }
-            } catch (error) {
-                console.error("Error fetching messages:", error);
-                return [];
             }
-        }
 
-        // Render chat messages
-        async function renderChat(eventId) {
-            chatBox.innerHTML = ""; // Clear chat box
-            const messages = await fetchMessages(eventId);
-            messages.forEach(msg => {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = msg.sender === localStorage.getItem("username") ? "self" : "other";
+            // Render chat messages
+            async function renderChat(eventId) {
+                chatBox.innerHTML = ""; // Clear chat box
+                const messages = await fetchMessages(eventId);
+                messages.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = msg.sender === localStorage.getItem("username") ? "self" : "other";
 
-                const senderSpan = document.createElement('span');
-                senderSpan.className = "sender";
-                senderSpan.textContent = msg.sender;
+                    const senderSpan = document.createElement('span');
+                    senderSpan.className = "sender";
+                    senderSpan.textContent = msg.sender;
 
-                const timestampSpan = document.createElement('span');
-                timestampSpan.className = "timestamp";
-                timestampSpan.textContent = new Date(msg.timestamp).toLocaleString();
+                    const timestampSpan = document.createElement('span');
+                    timestampSpan.className = "timestamp";
+                    timestampSpan.textContent = new Date(msg.timestamp).toLocaleString();
 
-                const messageContent = document.createElement('p');
-                messageContent.textContent = msg.message;
+                    const messageContent = document.createElement('p');
+                    messageContent.textContent = msg.message;
 
-                messageDiv.appendChild(senderSpan);
-                messageDiv.appendChild(timestampSpan);
-                messageDiv.appendChild(messageContent);
-                chatBox.appendChild(messageDiv);
-            });
-
-            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
-        }
-
-        // Start polling for new messages
-        function startPolling() {
-            if (pollInterval) clearInterval(pollInterval); // Clear any existing interval
-
-            pollInterval = setInterval(async () => {
-                if (currentEventId) {
-                    console.log("Polling for new messages...");
-                    await renderChat(currentEventId);
-                }
-            }, 3000); // Poll every 3 seconds
-        }
-
-        // Stop polling
-        function stopPolling() {
-            if (pollInterval) clearInterval(pollInterval);
-        }
-
-        // Send a new message
-        async function sendMessage(eventId, message) {
-            try {
-                const usernameLong = localStorage.getItem("username");
-                const username = usernameLong.split('@')[0];
-                if (!username) {
-                    console.error("Username not found in localStorage!");
-                    return;
-                }
-
-                const response = await fetch(`${API_BASE_URL}/participants/chats`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ eventId, sender: username, message }),
+                    messageDiv.appendChild(senderSpan);
+                    messageDiv.appendChild(timestampSpan);
+                    messageDiv.appendChild(messageContent);
+                    chatBox.appendChild(messageDiv);
                 });
 
-                if (response.ok) {
-                    // Add the message directly to the chat box
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = "self";
-                    messageDiv.textContent = message;
-                    chatBox.appendChild(messageDiv);
-                    chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
-                } else {
-                    console.error("Failed to send message");
+                chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+            }
+
+            // Start polling for new messages
+            function startPolling() {
+                if (pollInterval) clearInterval(pollInterval); // Clear any existing interval
+
+                pollInterval = setInterval(async () => {
+                    if (currentEventId) {
+                        console.log("Polling for new messages...");
+                        await renderChat(currentEventId);
+                    }
+                }, 3000); // Poll every 3 seconds
+            }
+
+            // Stop polling
+            function stopPolling() {
+                if (pollInterval) clearInterval(pollInterval);
+            }
+
+            // Send a new message
+            async function sendMessage(eventId, message) {
+                try {
+                    const usernameLong = localStorage.getItem("username");
+                    const username = usernameLong.split('@')[0];
+                    if (!username) {
+                        console.error("Username not found in localStorage!");
+                        return;
+                    }
+
+                    const response = await fetch('http://localhost:3000/participants/chats', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ eventId, sender: username, message }),
+                    });
+
+                    if (response.ok) {
+                        // Add the message directly to the chat box
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = "self";
+                        messageDiv.textContent = message;
+                        chatBox.appendChild(messageDiv);
+                        chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+                    } else {
+                        console.error("Failed to send message");
+                    }
+                } catch (error) {
+                    console.error("Error sending message:", error);
                 }
-            } catch (error) {
-                console.error("Error sending message:", error);
             }
-        }
 
-        // Event listener for send button
-        sendButton.addEventListener('click', () => {
-            const message = messageInput.value.trim();
-            if (message) {
-                sendMessage(currentEventId, message);
-                messageInput.value = ""; // Clear input
-            }
-        });
+            // Event listener for send button
+            sendButton.addEventListener('click', () => {
+                const message = messageInput.value.trim();
+                if (message) {
+                    sendMessage(currentEventId, message);
+                    messageInput.value = ""; // Clear input
+                }
+            });
 
-        // Event listener for event selection
-        eventsDropdown.addEventListener('change', () => {
-            const eventId = eventsDropdown.value;
-            currentEventId = eventId;
-            renderChat(eventId);
-            startPolling();
-        });
+            // Event listener for event selection
+            eventsDropdown.addEventListener('change', () => {
+                const eventId = eventsDropdown.value;
+                currentEventId = eventId;
+                renderChat(eventId);
+                startPolling();
+            });
 
-        // Initial setup
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchRegisteredEvents();
-            //saveUsernameToLocalStorage();
-        });
+            // Initial setup
+            document.addEventListener('DOMContentLoaded', () => {
+                fetchRegisteredEvents();
+                //saveUsernameToLocalStorage();
+            });
 
-    </script>
-</body>
-
-</html>
+        </script>
+    </body>
+   </html>
