@@ -595,6 +595,8 @@
     </div>
 
     <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <!-- Add this to decode JWT -->
 
     <script>
         // Theme switcher functionality
@@ -615,7 +617,6 @@
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
 
-
         const emojiTrigger = document.querySelector('.emoji-trigger');
         const emojiPicker = document.querySelector('.emoji-picker');
         const messageInput = document.querySelector('#message');
@@ -624,14 +625,12 @@
             emojiPicker.classList.toggle('active');
         });
 
-        // Close emoji picker when clicking outside
         document.addEventListener('click', (e) => {
             if (!emojiPicker.contains(e.target) && !emojiTrigger.contains(e.target)) {
                 emojiPicker.classList.remove('active');
             }
         });
 
-        // Insert emoji into input field
         const emojiItems = document.querySelectorAll('.emoji-item');
         emojiItems.forEach(emoji => {
             emoji.addEventListener('click', () => {
@@ -640,15 +639,30 @@
                 messageInput.focus();
             });
         });
+
         const eventsDropdown = document.getElementById('events');
         const chatBox = document.getElementById('chat-box');
-        // const messageInput = document.getElementById('message');
         const sendButton = document.getElementById('send-button');
 
         let currentEventId = null;
         let pollInterval = null;
 
-        // Fetch registered events for the participant
+        // Decode JWT and extract username
+        function getUsernameFromToken() {
+            const token = localStorage.getItem("authToken");
+            if (!token) {
+                console.error("Auth token not found in localStorage!");
+                return null;
+            }
+            try {
+                const decodedToken = jwt_decode(token); // Decode the token
+                return decodedToken.username; // Extract the username field
+            } catch (error) {
+                console.error("Error decoding JWT token:", error);
+                return null;
+            }
+        }
+
         async function fetchRegisteredEvents() {
             try {
                 const response = await fetch(`${API_BASE_URL}/participants/reg-events`, {
@@ -670,9 +684,8 @@
             }
         }
 
-        // Populate events dropdown
         function populateEvents(eventsData) {
-            eventsDropdown.innerHTML = ""; // Clear the dropdown
+            eventsDropdown.innerHTML = "";
             if (eventsData.events && eventsData.events.length > 0) {
                 eventsData.events.forEach((event) => {
                     const option = document.createElement('option');
@@ -681,7 +694,6 @@
                     eventsDropdown.appendChild(option);
                 });
 
-                // Render chat for the first event by default
                 currentEventId = eventsData.events[0]._id;
                 renderChat(currentEventId);
                 startPolling();
@@ -693,7 +705,6 @@
             }
         }
 
-        // Fetch chat messages for an event
         async function fetchMessages(eventId) {
             try {
                 const response = await fetch(`${API_BASE_URL}/participants/chats/${eventId}`);
@@ -709,13 +720,12 @@
             }
         }
 
-        // Render chat messages
         async function renderChat(eventId) {
-            chatBox.innerHTML = ""; // Clear chat box
+            chatBox.innerHTML = "";
             const messages = await fetchMessages(eventId);
             messages.forEach(msg => {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = msg.sender === localStorage.getItem("authToken") ? "self" : "other";
+                messageDiv.className = msg.sender === getUsernameFromToken() ? "self" : "other";
 
                 const senderSpan = document.createElement('span');
                 senderSpan.className = "sender";
@@ -734,65 +744,47 @@
                 chatBox.appendChild(messageDiv);
             });
 
-            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // Start polling for new messages
         function startPolling() {
-            if (pollInterval) clearInterval(pollInterval); // Clear any existing interval
+            if (pollInterval) clearInterval(pollInterval);
 
             pollInterval = setInterval(async () => {
                 if (currentEventId) {
                     console.log("Polling for new messages...");
                     await renderChat(currentEventId);
                 }
-            }, 3000); // Poll every 3 seconds
+            }, 3000);
         }
 
-        // Stop polling
         function stopPolling() {
             if (pollInterval) clearInterval(pollInterval);
         }
 
-        // Send a new message
         async function sendMessage(eventId, message) {
-            console.log("Inside funk");
             try {
-                console.log("Inside try");
-                const usernameLong = localStorage.getItem("authToken");
-                console.log("Username long", usernameLong);
-                const usernameShort = usernameLong.split("@");
-                console.log("usernameShort", usernameShort);
-                if (usernameShort.length !== 2 || !usernameShort[0] || !usernameShort[1]) {
-                    console.error("Invalid email format.");
-                    alert("Please enter a valid email address.");
-                    return;
-                }
-                const username = usernameShort[0];
-                const domain = usernameShort[1];
-
-                // Log the extracted parts
-                console.log("Username:", username);
-                console.log("Domain:", domain);
-
+                const username = getUsernameFromToken();
                 if (!username) {
-                    console.error("Username not found in localStorage!");
+                    console.error("Username not found in decoded JWT token!");
                     return;
                 }
 
                 const response = await fetch(`${API_BASE_URL}/participants/chats`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                    },
                     body: JSON.stringify({ eventId, sender: username, message }),
                 });
 
                 if (response.ok) {
-                    // Add the message directly to the chat box
                     const messageDiv = document.createElement('div');
                     messageDiv.className = "self";
                     messageDiv.textContent = message;
                     chatBox.appendChild(messageDiv);
-                    chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+                    chatBox.scrollTop = chatBox.scrollHeight;
                 } else {
                     console.error("Failed to send message");
                 }
@@ -801,16 +793,14 @@
             }
         }
 
-        // Event listener for send button
         sendButton.addEventListener('click', () => {
             const message = messageInput.value.trim();
             if (message) {
                 sendMessage(currentEventId, message);
-                messageInput.value = ""; // Clear input
+                messageInput.value = "";
             }
         });
 
-        // Event listener for event selection
         eventsDropdown.addEventListener('change', () => {
             const eventId = eventsDropdown.value;
             currentEventId = eventId;
@@ -818,13 +808,11 @@
             startPolling();
         });
 
-        // Initial setup
         document.addEventListener('DOMContentLoaded', () => {
             fetchRegisteredEvents();
-            //saveUsernameToLocalStorage();
         });
-
     </script>
+
 </body>
 
 </html>
