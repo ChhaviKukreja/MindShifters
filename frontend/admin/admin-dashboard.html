@@ -148,21 +148,23 @@
     }
 
     table thead th {
-    background: #3498db;
-    color: white;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    text-align: left; /* Aligns the table headings to the left */
-  }
+      background: #3498db;
+      color: white;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: left;
+      /* Aligns the table headings to the left */
+    }
 
-  table tbody td {
-    padding: 10px;
-    font-size: 14px;
-    border-bottom: 1px solid #eee;
-    text-align: left; /* Aligns the table data cells to the left */
-    vertical-align: top;
-  }
+    table tbody td {
+      padding: 10px;
+      font-size: 14px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      /* Aligns the table data cells to the left */
+      vertical-align: top;
+    }
 
     table tbody tr:hover {
       background: #f1f1f1;
@@ -171,6 +173,7 @@
     table tbody tr:last-child td {
       border-bottom: none;
     }
+
     .action-buttons {
       display: flex;
       gap: 10px;
@@ -372,6 +375,45 @@
       }
     }
 
+    async function viewLetterhead(eventId) {
+      try {
+        // Fetch the event details including the letterhead
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(`${API_BASE_URL}/admin/view-letterhead/${eventId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch letterhead");
+
+        const event = await response.json();
+
+        // Use jsPDF to generate the PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Add the letterhead HTML content to the PDF (simplified)
+        doc.html(event.letterhead, {
+          callback: function (doc) {
+            // Add the admin signature at the end
+            const adminSignature = `Signed by: ${event.adminName}`;
+            doc.text(adminSignature, 10, doc.internal.pageSize.height - 10);
+
+            // Save the generated PDF
+            doc.save(`${event.name}_Letterhead.pdf`);
+          },
+          x: 10,
+          y: 10,
+        });
+      } catch (error) {
+        console.error("Error generating letterhead PDF:", error);
+        alert("Error generating PDF");
+      }
+    }
+
     async function fetchEventCounts() {
       try {
         const token = localStorage.getItem("authToken");
@@ -400,4 +442,5 @@
     }
   </script>
 </body>
+
 </html>

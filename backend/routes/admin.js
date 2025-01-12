@@ -181,5 +181,28 @@ router.post("/approve-document/:eventId", adminMiddleware, async (req, res) => {
   }
 });
 
+router.get("/view-letterhead/:eventId", adminMiddleware, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    // Find the event
+    const event = await Events.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    // Include the admin's name
+    const adminName = "Admin Name"; // Replace with actual admin's name if dynamic
+
+    // Return the letterhead along with the admin name
+    res.status(200).json({
+      letterhead: event.letterhead, // The generated letterhead HTML
+      adminName: adminName,         // Admin's name
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch letterhead" });
+  }
+});
 
   module.exports = router;
