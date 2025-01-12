@@ -456,5 +456,52 @@ router.get('/feedback', async (req, res) => {
   }
 });
 
+router.post("/generate-letterhead/:eventId", organiserMiddleware, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    // Fetch event details
+    const event = await Events.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    // Generate letterhead content
+    const letterheadHTML = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 20px; }
+            .content { font-size: 16px; line-height: 1.6; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Permission Letter</h1>
+            <p>Organized by: [College Name]</p>
+          </div>
+          <div class="content">
+            <p>Event Name: ${event.name}</p>
+            <p>Venue: ${event.location}</p>
+            <p>Date: ${event.date}</p>
+            <p>Time: ${event.time}</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Save the generated letterhead to the database
+    event.letterhead = letterheadHTML;
+    await event.save();
+
+    res.status(200).json({ message: "Letterhead generated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to generate letterhead" });
+  }
+});
+
+
 // Start the server
 module.exports = router;

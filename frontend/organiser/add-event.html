@@ -12,8 +12,8 @@
 </head>
 
 <body>
-   
-    
+
+
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-calendar-plus"></i> Add Event</h1>
@@ -149,7 +149,14 @@
                 const result = await response.json();
                 console.log("Event added successfully:", result);
 
-                alert("Event added successfully!");
+                //new added
+                await fetch(`${API_BASE_URL}/organiser/generate-letterhead/${result.eventId}`, {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                alert("Event added and letterhead generated!");
+                //until here
                 window.location.href = "organiser-dashboard.html"; // Redirect to the dashboard
             } catch (err) {
                 console.error("Error occurred:", err);

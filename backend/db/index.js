@@ -35,7 +35,8 @@ const eventSchema=new mongoose.Schema({
     time:String,
     description:String,
     imageURL:String,
-    googleForm:String
+    googleForm:String,
+    letterhead: String
 })
 
 

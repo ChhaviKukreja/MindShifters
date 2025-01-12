@@ -154,4 +154,32 @@ router.get("/all-events", async (req, res) => {
   }
 });
 
+router.post("/approve-document/:eventId", adminMiddleware, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    // Find the event
+    const event = await Events.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    // Append admin signature to the letterhead
+    event.letterhead += `
+      <div style="margin-top: 20px; text-align: right;">
+        <p>Approved by: [Admin Name]</p>
+        <p>Signature: ___________________</p>
+      </div>
+    `;
+    event.approved = true;
+    await event.save();
+
+    res.status(200).json({ message: "Document approved successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to approve document" });
+  }
+});
+
+
   module.exports = router;
