@@ -393,7 +393,7 @@
         const event = await response.json();
 
         // Use jsPDF to generate the PDF
-        window.jsPDF = window.jspdf.jsPDF;
+        const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
         // Add the letterhead HTML content to the PDF (simplified)
