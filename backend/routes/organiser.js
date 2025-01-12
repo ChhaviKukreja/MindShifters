@@ -466,42 +466,42 @@ router.post("/generate-letterhead/:eventId", organiserMiddleware, async (req, re
       return res.status(404).json({ message: "Event not found" });
     }
 
-    // Generate letterhead content
-    const letterheadHTML = `
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { text-align: center; margin-bottom: 20px; }
-            .content { font-size: 16px; line-height: 1.6; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>Permission Letter</h1>
-            <p>Organized by: [College Name]</p>
-          </div>
-          <div class="content">
-            <p>Event Name: ${event.name}</p>
-            <p>Venue: ${event.location}</p>
-            <p>Date: ${event.date}</p>
-            <p>Time: ${event.time}</p>
-          </div>
-        </body>
-      </html>
-    `;
+    // Create a new jsPDF instance
+    const doc = new jsPDF();
 
-    // Save the generated letterhead to the database
-    event.letterhead = letterheadHTML;
+    // Set font
+    doc.setFont("helvetica");
+
+    // Add content to PDF
+    doc.setFontSize(18);
+    doc.text("Permission Letter", 105, 30, null, null, "center");
+    
+    doc.setFontSize(12);
+    doc.text(`Organized by: [College Name]`, 105, 40, null, null, "center");
+
+    doc.text(`Event Name: ${event.event}`, 20, 60);
+    doc.text(`Venue: ${event.location}`, 20, 70);
+    doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 20, 80);
+    doc.text(`Time: ${event.time}`, 20, 90);
+
+    // Save the PDF to a file
+    const letterheadPath = path.join(__dirname, `../uploads/letterheads/${eventId}_letterhead.pdf`);
+    
+    // Save the PDF to the file system
+    doc.save(letterheadPath);
+
+    // Optionally store the file path in your event document
+    event.letterheadPath = letterheadPath;
     await event.save();
 
-    res.status(200).json({ message: "Letterhead generated successfully" });
+    res.status(200).json({
+      message: "Letterhead generated successfully",
+      letterheadUrl: `/uploads/letterheads/${eventId}_letterhead.pdf`, // URL to download the letterhead
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to generate letterhead" });
   }
 });
-
-
 // Start the server
 module.exports = router;
