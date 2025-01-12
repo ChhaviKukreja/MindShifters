@@ -491,7 +491,7 @@ router.post("/generate-letterhead/:eventId", organiserMiddleware, async (req, re
     doc.save(letterheadPath);
 
     // Optionally store the file path in your event document
-    event.letterheadPath = letterheadPath;
+    event.letterhead = letterheadPath;
     await event.save();
 
     res.status(200).json({
