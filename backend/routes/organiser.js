@@ -504,4 +504,22 @@ router.post("/generate-letterhead/:eventId", organiserMiddleware, async (req, re
   }
 });
 // Start the server
+
+router.get('/event-details', async (req, res) => {
+  const eventId = req.query.eventId;  // Get eventId from query parameter
+  if (!eventId) {
+    return res.status(400).send('Event ID is required');
+  }
+
+  try {
+    const event = await Event.findById(eventId);  // Find event by ID
+    if (!event) {
+      return res.status(404).send('Event not found');
+    }
+    res.json(event);  // Send the event details as JSON response
+  } catch (error) {
+    res.status(500).send('Error fetching event details');
+  }
+});
+
 module.exports = router;
