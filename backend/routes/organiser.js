@@ -456,54 +456,54 @@ router.get('/feedback', async (req, res) => {
   }
 });
 
-router.post("/generate-letterhead/:eventId", organiserMiddleware, async (req, res) => {
-  try {
-    const { eventId } = req.params;
+// router.post("/generate-letterhead/:eventId", organiserMiddleware, async (req, res) => {
+//   try {
+//     const { eventId } = req.params;
 
-    // Fetch event details
-    const event = await Events.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
+//     // Fetch event details
+//     const event = await Events.findById(eventId);
+//     if (!event) {
+//       return res.status(404).json({ message: "Event not found" });
+//     }
 
-    // Create a new jsPDF instance
-    const doc = new jsPDF();
+//     // Create a new jsPDF instance
+//     const doc = new jsPDF();
 
-    // Set font
-    doc.setFont("helvetica");
+//     // Set font
+//     doc.setFont("helvetica");
 
-    // Add content to PDF
-    doc.setFontSize(18);
-    doc.text("Permission Letter", 105, 30, null, null, "center");
+//     // Add content to PDF
+//     doc.setFontSize(18);
+//     doc.text("Permission Letter", 105, 30, null, null, "center");
     
-    doc.setFontSize(12);
-    doc.text(`Organized by: [College Name]`, 105, 40, null, null, "center");
+//     doc.setFontSize(12);
+//     doc.text(`Organized by: [College Name]`, 105, 40, null, null, "center");
 
-    doc.text(`Event Name: ${event.event}`, 20, 60);
-    doc.text(`Venue: ${event.location}`, 20, 70);
-    doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 20, 80);
-    doc.text(`Time: ${event.time}`, 20, 90);
+//     doc.text(`Event Name: ${event.event}`, 20, 60);
+//     doc.text(`Venue: ${event.location}`, 20, 70);
+//     doc.text(`Date: ${new Date(event.date).toLocaleDateString()}`, 20, 80);
+//     doc.text(`Time: ${event.time}`, 20, 90);
 
-    // Save the PDF to a file
-    const letterheadPath = path.join(__dirname, `../uploads/letterheads/${eventId}_letterhead.pdf`);
+//     // Save the PDF to a file
+//     const letterheadPath = path.join(__dirname, `../uploads/letterheads/${eventId}_letterhead.pdf`);
     
-    // Save the PDF to the file system
-    doc.save(letterheadPath);
+//     // Save the PDF to the file system
+//     doc.save(letterheadPath);
 
-    // Optionally store the file path in your event document
-    event.letterhead = letterheadPath;
-    await event.save();
+//     // Optionally store the file path in your event document
+//     event.letterhead = letterheadPath;
+//     await event.save();
 
-    res.status(200).json({
-      message: "Letterhead generated successfully",
-      letterheadUrl: `/uploads/letterheads/${eventId}_letterhead.pdf`, // URL to download the letterhead
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to generate letterhead" });
-  }
-});
-// Start the server
+//     res.status(200).json({
+//       message: "Letterhead generated successfully",
+//       letterheadUrl: `/uploads/letterheads/${eventId}_letterhead.pdf`, // URL to download the letterhead
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Failed to generate letterhead" });
+//   }
+// });
+// // Start the server
 
 router.get('/event-details', async (req, res) => {
   const eventId = req.query.eventId;  // Get eventId from query parameter
@@ -521,5 +521,37 @@ router.get('/event-details', async (req, res) => {
     res.status(500).send('Error fetching event details');
   }
 });
+
+router.post('/generate-letterhead', async (req, res) => {
+  const { eventName, letterhead } = req.body;
+
+  // Validate the inputs
+  if (!eventName || !letterhead) {
+    return res.status(400).send('Event name and Letterhead URL are required.');
+  }
+
+  try {
+    // Find the event by name
+    const event = await Events.findOne({ event: eventName });
+
+    if (!event) {
+      return res.status(404).send('Event not found.');
+    }
+
+    // Save the letterhead URL to the event
+    event.letterhead = letterhead;
+    await event.save();
+
+    res.status(200).json({
+      message: 'Letterhead URL saved successfully.',
+      event,
+    });
+  } catch (error) {
+    console.error('Error saving letterhead URL:', error);
+    res.status(500).send('Internal Server Error.');
+  }
+});
+
+
 
 module.exports = router;
