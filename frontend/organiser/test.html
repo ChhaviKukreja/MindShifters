@@ -157,7 +157,7 @@
         </div>
     </div>
 
-    <script src = "config.js"></script>
+    <script src="config.js"></script>
 
     <script>
         window.jsPDF = window.jspdf.jsPDF;
@@ -220,11 +220,13 @@
             doc.text(`Email: ${coordinatorEmail}`, 20, 230);
 
             // Generate blob and URL
+            console.log("generating url")
             const pdfBlob = doc.output('blob');
             if (documentUrl) {
                 URL.revokeObjectURL(documentUrl); // Clean up old URL
             }
             documentUrl = URL.createObjectURL(pdfBlob);
+            console.log("url generated", documentUrl);
 
             // Display URL
             document.getElementById('urlContainer').style.display = 'block';
@@ -232,30 +234,37 @@
 
             // Save the PDF
             saveLetterheadURL(eventName, documentUrl);
+            console.log("after calling the fxn");
             doc.save('event_permission_letter.pdf');
         }
 
-        function saveLetterheadURL(eventName, letterhead) {
-            fetch(`${API_BASE_URL}/organiser/generate-letterhead`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ eventName, letterhead }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message); // Show success message
-                    } else {
-                        alert('Failed to save letterhead URL.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error saving letterhead URL:', error);
-                    alert('An error occurred while saving the letterhead URL.');
+        async function saveLetterheadURL(eventName, letterhead) {
+            try {
+                console.log("before post");
+                const response = await fetch(`${API_BASE_URL}/organiser/generate-letterhead`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ eventName, letterhead }),
                 });
+                console.log("response", response);
+
+                const data = await response.json();
+
+                console.log("data", data);
+
+                if (response.ok) {
+                    alert(data.message); // Show success message
+                } else {
+                    alert(data.message || 'Failed to save letterhead URL.');
+                }
+            } catch (error) {
+                console.error('Error saving letterhead URL:', error);
+                alert('An error occurred while saving the letterhead URL.');
+            }
         }
+
 
         function copyURL() {
             navigator.clipboard.writeText(documentUrl).then(() => {

@@ -523,7 +523,9 @@ router.get('/event-details', async (req, res) => {
 });
 
 router.post('/generate-letterhead', async (req, res) => {
+  console.log("inside generate")
   const { eventName, letterhead } = req.body;
+  console.log("boddy found", letterhead)
 
   // Validate the inputs
   if (!eventName || !letterhead) {
@@ -537,10 +539,12 @@ router.post('/generate-letterhead', async (req, res) => {
     if (!event) {
       return res.status(404).send('Event not found.');
     }
+    console.log("event found", event)
 
     // Save the letterhead URL to the event
     event.letterhead = letterhead;
     await event.save();
+    console.log("letterhead added")
 
     res.status(200).json({
       message: 'Letterhead URL saved successfully.',
