@@ -150,13 +150,13 @@
                 console.log("Event added successfully:", result);
 
                 //new added
-                await fetch(`${API_BASE_URL}/organiser/generate-letterhead/${result.eventId}`, {
-                    method: "POST",
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                // await fetch(`${API_BASE_URL}/organiser/generate-letterhead/${result.eventId}`, {
+                //     method: "POST",
+                //     headers: { Authorization: `Bearer ${token}` },
+                // });
 
-                alert("Event added and letterhead generated!");
-                //until here
+                // alert("Event added and letterhead generated!");
+                // //until here
                 window.location.href = "organiser-dashboard.html"; // Redirect to the dashboard
             } catch (err) {
                 console.error("Error occurred:", err);

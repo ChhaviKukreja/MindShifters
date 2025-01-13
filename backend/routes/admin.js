@@ -184,16 +184,18 @@ router.post("/approve-document/:eventId", adminMiddleware, async (req, res) => {
 router.get("/view-letterhead/:eventId", adminMiddleware, async (req, res) => {
   try {
     const { eventId } = req.params;
+    console.log("eventid", eventId);
 
     // Find the event
     const event = await Events.findById(eventId);
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
     }
+    console.log("event", event);
 
     // Include the admin's name
     const adminName =  req.username ; // Replace with actual admin's name if dynamic
-
+    console.log("adminName", adminName);
     // Return the letterhead along with the admin name
     res.status(200).json({
       letterhead: event.letterhead, // The generated letterhead HTML
