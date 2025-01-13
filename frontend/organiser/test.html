@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,54 +11,45 @@
             margin: 0;
             padding: 0;
         }
-
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
             padding: 20px;
             background-color: #f5f5f5;
         }
-
         .container {
             max-width: 800px;
             margin: 0 auto;
             background-color: white;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-
         h1 {
             text-align: center;
             color: #333;
             margin-bottom: 30px;
         }
-
         .form-group {
             margin-bottom: 20px;
         }
-
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
             color: #555;
         }
-
-        input,
-        textarea {
+        input, textarea {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
         }
-
         textarea {
             height: 100px;
             resize: vertical;
         }
-
         button {
             display: block;
             width: 100%;
@@ -71,38 +61,12 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-bottom: 10px;
         }
-
         button:hover {
             background-color: #45a049;
         }
-
-        #urlDisplay {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            word-break: break-all;
-        }
-
-        .url-container {
-            display: none;
-            margin-top: 20px;
-        }
-
-        .copy-button {
-            background-color: #007bff;
-            margin-top: 10px;
-        }
-
-        .copy-button:hover {
-            background-color: #0056b3;
-        }
     </style>
 </head>
-
 <body>
     <div class="container">
         <h1>Event Permission Letter Generator</h1>
@@ -111,61 +75,42 @@
                 <label for="eventName">Event Name:</label>
                 <input type="text" id="eventName" required>
             </div>
-
             <div class="form-group">
                 <label for="eventDate">Event Date:</label>
                 <input type="date" id="eventDate" required>
             </div>
-
             <div class="form-group">
                 <label for="eventTime">Event Time:</label>
                 <input type="time" id="eventTime" required>
             </div>
-
             <div class="form-group">
                 <label for="location">Location:</label>
                 <input type="text" id="location" required>
             </div>
-
             <div class="form-group">
                 <label for="description">Event Description:</label>
                 <textarea id="description" required></textarea>
             </div>
-
             <div class="form-group">
                 <label for="coordinatorName">Student Coordinator Name:</label>
                 <input type="text" id="coordinatorName" required>
             </div>
-
             <div class="form-group">
                 <label for="coordinatorContact">Contact Number:</label>
                 <input type="tel" id="coordinatorContact" required>
             </div>
-
             <div class="form-group">
                 <label for="coordinatorEmail">Email:</label>
                 <input type="email" id="coordinatorEmail" required>
             </div>
-
-            <button type="button" onclick="generatePDFAndURL()">Generate PDF and URL</button>
+            <button type="button" onclick="generatePDF()">Generate PDF</button>
         </form>
-
-        <div id="urlContainer" class="url-container">
-            <h3>Document URL:</h3>
-            <div id="urlDisplay"></div>
-            <button onclick="copyURL()" class="copy-button">Copy URL</button>
-        </div>
     </div>
-
-    <script src="config.js"></script>
-
     <script>
         window.jsPDF = window.jspdf.jsPDF;
-        let documentUrl = '';
-
-        function generatePDFAndURL() {
+        function generatePDF() {
             const doc = new jsPDF();
-
+            
             // Get form values
             const eventName = document.getElementById('eventName').value;
             const eventDate = new Date(document.getElementById('eventDate').value)
@@ -176,112 +121,44 @@
             const coordinatorName = document.getElementById('coordinatorName').value;
             const coordinatorContact = document.getElementById('coordinatorContact').value;
             const coordinatorEmail = document.getElementById('coordinatorEmail').value;
-
             // Set font size and type
             doc.setFontSize(12);
             doc.setFont('helvetica');
-
             // Add content
             doc.text('To:', 20, 20);
             doc.text('The Dean of Student Affairs', 20, 30);
             doc.text('PUNJAB ENGINEERING COLLEGE, SECTOR 12, CHANDIGARH', 20, 40);
-
             doc.setFont('helvetica', 'bold');
             doc.text(`Subject: Request for Permission to Host ${eventName}`, 20, 60);
-
+            
             doc.setFont('helvetica', 'normal');
             doc.text('Dear Dean,', 20, 80);
-
             // Split long text into multiple lines
             const description1 = `I am writing to request your permission to host the ${eventName} on ${eventDate} at ${location}.`;
             const description2 = `The event aims to ${description}`;
-
+            
             const splitDescription1 = doc.splitTextToSize(description1, 170);
             const splitDescription2 = doc.splitTextToSize(description2, 170);
-
+            
             doc.text(splitDescription1, 20, 90);
             doc.text(splitDescription2, 20, 100);
-
             doc.setFont('helvetica', 'bold');
             doc.text('Details of the event:', 20, 120);
-
+            
             doc.setFont('helvetica', 'normal');
             doc.text(`Date & Time: ${eventDate} from ${eventTime}`, 30, 130);
             doc.text(`Location: ${location}`, 30, 140);
-
             const appreciationText = 'We would greatly appreciate your approval to proceed with the event. Please let me know if you need any further information.';
             const splitAppreciation = doc.splitTextToSize(appreciationText, 170);
             doc.text(splitAppreciation, 20, 160);
-
             doc.text('Thank you for your consideration.', 20, 180);
             doc.text('Sincerely,', 20, 200);
             doc.text(coordinatorName, 20, 210);
             doc.text(`Contact: ${coordinatorContact}`, 20, 220);
             doc.text(`Email: ${coordinatorEmail}`, 20, 230);
-
-            // Generate blob and URL
-            console.log("generating url")
-            const pdfBlob = doc.output('blob');
-            if (documentUrl) {
-                URL.revokeObjectURL(documentUrl); // Clean up old URL
-            }
-            documentUrl = URL.createObjectURL(pdfBlob);
-            console.log("url generated", documentUrl);
-
-            // Display URL
-            document.getElementById('urlContainer').style.display = 'block';
-            document.getElementById('urlDisplay').textContent = documentUrl;
-
             // Save the PDF
-            saveLetterheadURL(eventName, documentUrl);
-            console.log("after calling the fxn");
             doc.save('event_permission_letter.pdf');
         }
-
-        async function saveLetterheadURL(eventName, letterhead) {
-            try {
-                console.log("before post");
-                const response = await fetch(`${API_BASE_URL}/organiser/generate-letterhead`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ eventName, letterhead }),
-                });
-                console.log("response", response);
-
-                const data = await response.json();
-
-                console.log("data", data);
-
-                if (response.ok) {
-                    alert(data.message); // Show success message
-                } else {
-                    alert(data.message || 'Failed to save letterhead URL.');
-                }
-            } catch (error) {
-                console.error('Error saving letterhead URL:', error);
-                alert('An error occurred while saving the letterhead URL.');
-            }
-        }
-
-
-        function copyURL() {
-            navigator.clipboard.writeText(documentUrl).then(() => {
-                alert('URL copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy URL:', err);
-                alert('Failed to copy URL to clipboard');
-            });
-        }
-
-        // Clean up URL when page is unloaded
-        window.addEventListener('unload', function () {
-            if (documentUrl) {
-                URL.revokeObjectURL(documentUrl);
-            }
-        });
     </script>
 </body>
-
 </html>
