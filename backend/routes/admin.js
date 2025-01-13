@@ -192,7 +192,7 @@ router.get("/view-letterhead/:eventId", adminMiddleware, async (req, res) => {
     }
 
     // Include the admin's name
-    const adminName = "Admin Name"; // Replace with actual admin's name if dynamic
+    const adminName =  req.username ; // Replace with actual admin's name if dynamic
 
     // Return the letterhead along with the admin name
     res.status(200).json({
@@ -204,5 +204,43 @@ router.get("/view-letterhead/:eventId", adminMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch letterhead" });
   }
 });
+
+// router.get("/letterhead/:eventId", async (req, res) => {
+//   try {
+//     const { eventId } = req.params;
+//     const event = await Event.findById(eventId);
+
+//     if (!event || !event.letterhead) {
+//       return res.status(404).json({ message: "Letterhead not found" });
+//     }
+
+//     res.json({ letterhead: event.letterhead });
+//   } catch (error) {
+//     console.error("Error fetching letterhead:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+// Sign letterhead and approve event
+router.post("/sign/:eventId", async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    // Logic to mark the event as approved
+    event.status = "Approved"; // Assuming you have a status field
+    await event.save();
+
+    res.json({ message: "Event approved successfully" });
+  } catch (error) {
+    console.error("Error signing letterhead:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
   module.exports = router;

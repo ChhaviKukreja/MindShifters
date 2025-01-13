@@ -556,41 +556,4 @@ router.post('/generate-letterhead', async (req, res) => {
   }
 });
 
-router.get("/admin/letterhead/:eventId", async (req, res) => {
-  try {
-    const { eventId } = req.params;
-    const event = await Event.findById(eventId);
-
-    if (!event || !event.letterhead) {
-      return res.status(404).json({ message: "Letterhead not found" });
-    }
-
-    res.json({ letterhead: event.letterhead });
-  } catch (error) {
-    console.error("Error fetching letterhead:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-// Sign letterhead and approve event
-router.post("/admin/sign/:eventId", async (req, res) => {
-  try {
-    const { eventId } = req.params;
-    const event = await Event.findById(eventId);
-
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    // Logic to mark the event as approved
-    event.status = "Approved"; // Assuming you have a status field
-    await event.save();
-
-    res.json({ message: "Event approved successfully" });
-  } catch (error) {
-    console.error("Error signing letterhead:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 module.exports = router;
