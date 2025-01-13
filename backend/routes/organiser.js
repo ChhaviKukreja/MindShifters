@@ -546,7 +546,7 @@ router.post('/generate-letterhead', async (req, res) => {
 
     // Save the letterhead URL to the event
     event.letterhead = letterhead;
-    const filePath = path.resolve(__dirname, `../Downloads/${path.basename(letterhead)}`);
+    const filePath = path.resolve(__dirname, `../Downloads/event_permission_letter`);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "Letterhead file not found" });
     }
