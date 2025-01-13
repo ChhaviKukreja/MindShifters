@@ -37,11 +37,11 @@
             overflow-y: auto;
         }
 
-        .progress-info {
+        /* .progress-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
+        } */
     </style>
 </head>
 
@@ -91,14 +91,14 @@
                     </ul>
                 </div>
 
-                <div class="progress-info mb-4">
+                <!-- <div class="progress-info mb-4">
                     <span>Progress</span>
                     <span id="progressPercentage">50%</span>
                 </div>
                 <div class="progress">
                     <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 50%;">50%
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <!-- Task Details -->
@@ -397,47 +397,47 @@
 
 
         const taskStatus = document.getElementById("taskStatus");
-        const progressBar = document.getElementById("progressBar");
-        const progressPercentage = document.getElementById("progressPercentage");
+        // const progressBar = document.getElementById("progressBar");
+        // const progressPercentage = document.getElementById("progressPercentage");
 
-        // Function to update progress based on selected status
-        function updateProgress(status) {
-            let progress = 0;
-            let colorClass = 'bg-secondary'; // Default color for "Not Started"
+        // // Function to update progress based on selected status
+        // function updateProgress(status) {
+        //     let progress = 0;
+        //     let colorClass = 'bg-secondary'; // Default color for "Not Started"
 
-            // Determine progress and color based on status
-            switch (status) {
-                case 'Not Started':
-                    progress = 0;
-                    colorClass = 'bg-secondary'; // Gray color
-                    break;
-                case 'In Progress':
-                    progress = 50;
-                    colorClass = 'bg-warning'; // Yellow color
-                    break;
-                case 'Completed':
-                    progress = 100;
-                    colorClass = 'bg-success'; // Green color
-                    break;
-                default:
-                    progress = 0;
-                    colorClass = 'bg-secondary';
-            }
+        //     // Determine progress and color based on status
+        //     switch (status) {
+        //         case 'Not Started':
+        //             progress = 0;
+        //             colorClass = 'bg-secondary'; // Gray color
+        //             break;
+        //         case 'In Progress':
+        //             progress = 50;
+        //             colorClass = 'bg-warning'; // Yellow color
+        //             break;
+        //         case 'Completed':
+        //             progress = 100;
+        //             colorClass = 'bg-success'; // Green color
+        //             break;
+        //         default:
+        //             progress = 0;
+        //             colorClass = 'bg-secondary';
+        //     }
 
-            // Update the progress bar width, text, and color
-            progressBar.style.width = `${progress}%`;
-            progressBar.className = `progress-bar ${colorClass}`; // Set color dynamically
-            progressBar.textContent = `${progress}%`; // Show percentage inside progress bar
-            progressPercentage.textContent = `${progress}%`; // Show percentage outside progress bar
-        }
+        //     // Update the progress bar width, text, and color
+        //     progressBar.style.width = `${progress}%`;
+        //     progressBar.className = `progress-bar ${colorClass}`; // Set color dynamically
+        //     progressBar.textContent = `${progress}%`; // Show percentage inside progress bar
+        //     progressPercentage.textContent = `${progress}%`; // Show percentage outside progress bar
+        // }
 
-        // Event listener to update progress when status is changed
-        taskStatus.addEventListener("change", function () {
-            updateProgress(taskStatus.value);
-        });
+        // // Event listener to update progress when status is changed
+        // taskStatus.addEventListener("change", function () {
+        //     updateProgress(taskStatus.value);
+        // });
 
-        // Initialize the progress bar with default status ("Not Started")
-        updateProgress(taskStatus.value);
+        // // Initialize the progress bar with default status ("Not Started")
+        // updateProgress(taskStatus.value);
 
     </script>
 
