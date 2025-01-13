@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
   <link rel="stylesheet" href="organiser.css">
 </head>
+
 <body>
   <!-- Sidebar -->
   <div class="sidebar">
@@ -21,55 +23,58 @@
 
   <!-- Main Content -->
   <div class="main-content">
-    <!-- Header -->
-    <header>
-      <h1>Organiser</h1>
-      <div class="header-buttons">
-        <button class="btn btn-primary" onclick="window.location.href='about-us.html';">About Us</button>
-        <button class="btn btn-secondary" onclick="logout();">Log out</button>
-      </div>
-    </header>
+    <div class="dashboard-container">
+      <!-- Header -->
+      <header>
+        <h1>Organiser</h1>
+        <div class="header-buttons">
+          <button class="btn btn-primary" onclick="window.location.href='about-us.html';">About Us</button>
+          <button class="btn btn-secondary" onclick="logout();">Log out</button>
+        </div>
+      </header>
 
-    <!-- Cards Section -->
-    <div class="cards">
-      <div class="card" onclick="window.location.href='add-event.html';" style="cursor: pointer;">
-        <span>📅</span>
-        <h3>Add Event</h3>
+      <!-- Cards Section -->
+      <div class="cards">
+        <div class="card" onclick="window.location.href='add-event.html';" style="cursor: pointer;">
+          <span>📅</span>
+          <h3>Add Event</h3>
+        </div>
+        <div class="card" onclick="window.location.href='todolist.html';" style="cursor: pointer;">
+          <span>📝</span>
+          <h3>To-do List</h3>
+        </div>
+        <div class="card" onclick="window.location.href='approved-events.html';" style="cursor: pointer;">
+          <span>📆</span>
+          <h3>Approved Events</h3>
+        </div>
+        <div class="card" onclick="window.location.href='broadcast.html';" style="cursor: pointer;">
+          <span>📜</span>
+          <h3>Broadcast Announcements</h3>
+        </div>
       </div>
-      <div class="card" onclick="window.location.href='todolist.html';" style="cursor: pointer;">
-        <span>📝</span>
-        <h3>To-do List</h3>
-      </div>
-      <div class="card" onclick="window.location.href='approved-events.html';" style="cursor: pointer;">
-        <span>📆</span>
-        <h3>Approved Events</h3>
-      </div>
-      <div class="card" onclick="window.location.href='broadcast.html';" style="cursor: pointer;">
-        <span>📜</span>
-        <h3>Broadcast Announcements</h3>
+
+      <!-- Tables Section -->
+      <div class="table-section">
+        <h2>Request Administrative Approval</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Event</th>
+              <th>Location</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Student Coordinator(s)</th>
+            </tr>
+          </thead>
+          <tbody id="event-table-body">
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
 
-    <!-- Tables Section -->
-    <div class="table-section">
-      <h2>Request Administrative Approval</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Event</th>
-            <th>Location</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Student Coordinator(s)</th>
-          </tr>
-        </thead>
-        <tbody id="event-table-body">
-        </tbody>
-      </table>
-    </div>
-
-    <script src="config.js"></script>
+  <script src="config.js"></script>
 
   <script>
     // Ensure DOM is fully loaded
@@ -101,37 +106,37 @@
 
     // Fetch and display events in the table
     async function fetchAndDisplayEvents() {
-    try {
-      const token = localStorage.getItem("authToken");
-      const response = await fetch(`${API_BASE_URL}/organiser/orgEvents`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(`${API_BASE_URL}/organiser/orgEvents`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch event data");
-      }
+        if (!response.ok) {
+          throw new Error("Failed to fetch event data");
+        }
 
-      const events = await response.json();
-      console.log("in organiser", events);
-      const tableBody = document.getElementById("event-table-body");
-      tableBody.innerHTML = ""; // Clear existing rows
-      console.log("yo");
+        const events = await response.json();
+        console.log("in organiser", events);
+        const tableBody = document.getElementById("event-table-body");
+        tableBody.innerHTML = ""; // Clear existing rows
+        console.log("yo");
 
-      if (events.length === 0 || events.events.length == 0) {
-        tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center;">No events found</td></tr>`;
-        return;
-      }
-      console.log("here1");
-      events.events.forEach((event, index) => {
-        console.log("hi");
-        const studentCoords = event.stuCoord.map(coord =>  `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`).join('<br>');
-        console.log("after map");
-        
-        const row = `
+        if (events.length === 0 || events.events.length == 0) {
+          tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center;">No events found</td></tr>`;
+          return;
+        }
+        console.log("here1");
+        events.events.forEach((event, index) => {
+          console.log("hi");
+          const studentCoords = event.stuCoord.map(coord => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`).join('<br>');
+          console.log("after map");
+
+          const row = `
           <tr>
             <td>${index + 1}</td>
             <td>${event.event}</td>
@@ -141,13 +146,13 @@
             <td>${studentCoords}</td>
           </tr>
         `;
-        tableBody.insertAdjacentHTML("beforeend", row);
-      });
-    } catch (error) {
-      console.error("Error loading events:", error);
-      alert("Failed to load events. Please try again later.");
+          tableBody.insertAdjacentHTML("beforeend", row);
+        });
+      } catch (error) {
+        console.error("Error loading events:", error);
+        alert("Failed to load events. Please try again later.");
+      }
     }
-  }
 
     // Log out function
     function logout() {
@@ -163,4 +168,5 @@
     }
   </script>
 </body>
+
 </html>
