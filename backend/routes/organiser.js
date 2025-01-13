@@ -522,6 +522,9 @@ router.get('/event-details', async (req, res) => {
   }
 });
 
+const fs = require("fs");
+const path = require("path");
+
 router.post('/generate-letterhead', async (req, res) => {
   console.log("inside generate")
   const { eventName, letterhead } = req.body;
@@ -543,6 +546,15 @@ router.post('/generate-letterhead', async (req, res) => {
 
     // Save the letterhead URL to the event
     event.letterhead = letterhead;
+    const filePath = path.resolve(__dirname, `../Downloads/${path.basename(letterhead)}`);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "Letterhead file not found" });
+    }
+
+    const pdfBuffer = fs.readFileSync(filePath);
+    const base64Pdf = pdfBuffer.toString("base64");
+
+    event.letterhead = base64Pdf;
     await event.save();
     console.log("letterhead added")
 

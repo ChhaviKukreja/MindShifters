@@ -207,23 +207,6 @@ router.get("/view-letterhead/:eventId", adminMiddleware, async (req, res) => {
   }
 });
 
-// router.get("/letterhead/:eventId", async (req, res) => {
-//   try {
-//     const { eventId } = req.params;
-//     const event = await Event.findById(eventId);
-
-//     if (!event || !event.letterhead) {
-//       return res.status(404).json({ message: "Letterhead not found" });
-//     }
-
-//     res.json({ letterhead: event.letterhead });
-//   } catch (error) {
-//     console.error("Error fetching letterhead:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
-
-// Sign letterhead and approve event
 router.post("/sign/:eventId", async (req, res) => {
   try {
     const { eventId } = req.params;
@@ -243,6 +226,72 @@ router.post("/sign/:eventId", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+//new code starts here  
+// const fs = require("fs");
+// const path = require("path");
+// router.post("/save-pdf-base64/:eventId", adminMiddleware, async (req, res) => {
+//   try {
+//     const { eventId } = req.params;
+//     const event = await Events.findById(eventId);
+
+//     if (!event) {
+//       return res.status(404).json({ message: "Event not found" });
+//     }
+
+//     const pdfPath = path.join(__dirname, `../downloads/${eventId}.pdf`); // Adjust path as per your setup
+//     if (!fs.existsSync(pdfPath)) {
+//       return res.status(404).json({ message: "PDF file not found" });
+//     }
+
+//     const pdfBase64 = fs.readFileSync(pdfPath, { encoding: "base64" });
+//     event.letterhead = pdfBase64;
+//     await event.save();
+
+//     res.status(200).json({ message: "PDF saved in Base64 format" });
+//   } catch (error) {
+//     console.error("Error saving PDF in Base64:", error);
+//     res.status(500).json({ message: "Failed to save PDF in Base64" });
+//   }
+// });
+
+router.get("/get-pdf-base64/:eventId", adminMiddleware, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const event = await Events.findById(eventId);
+
+    if (!event || !event.letterhead) {
+      return res.status(404).json({ message: "Letterhead not found" });
+    }
+
+    res.status(200).json({ base64: event.letterhead });
+  } catch (error) {
+    console.error("Error fetching Base64 PDF:", error);
+    res.status(500).json({ message: "Failed to fetch Base64 PDF" });
+  }
+});
+
+router.post("/sign-pdf/:eventId", adminMiddleware, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { signedBase64 } = req.body;
+
+    const event = await Events.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    event.letterheadBase64 = signedBase64;
+    event.status = "Approved"; // Optional: update status
+    await event.save();
+
+    res.status(200).json({ message: "PDF signed and updated successfully" });
+  } catch (error) {
+    console.error("Error signing PDF:", error);
+    res.status(500).json({ message: "Failed to sign PDF" });
+  }
+});
+
 
 
   module.exports = router;
