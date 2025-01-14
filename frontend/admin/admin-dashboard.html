@@ -5,6 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -144,7 +148,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      text-align: center;
+      margin: 20px 0;
     }
 
     table thead th {
@@ -153,12 +157,17 @@
       padding: 10px;
       font-size: 14px;
       font-weight: 600;
+      text-align: left;
+      /* Aligns the table headings to the left */
     }
 
     table tbody td {
       padding: 10px;
       font-size: 14px;
       border-bottom: 1px solid #eee;
+      text-align: left;
+      /* Aligns the table data cells to the left */
+      vertical-align: top;
     }
 
     table tbody tr:hover {
@@ -167,6 +176,28 @@
 
     table tbody tr:last-child td {
       border-bottom: none;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-view {
+      background-color: #3498db;
+    }
+
+    .btn-approve {
+      background-color: #2ecc71;
     }
 
     /* Responsive Design */
@@ -208,8 +239,8 @@
 
     <section class="cards">
       <div class="card">
-          <span id="pending-count">0</span>
-          <h3>Pending Event Requests</h3>
+        <span id="pending-count">0</span>
+        <h3>Pending Event Requests</h3>
       </div>
     </section>
 
@@ -224,7 +255,7 @@
             <th>Date</th>
             <th>Time</th>
             <th>Actions</th>
-            <th>Student Coordinator(s)</th> 
+            <th>Student Coordinator(s)</th>
           </tr>
         </thead>
         <tbody id="pending-events-table">
@@ -234,6 +265,17 @@
     </section>
   </div>
 
+  <div class="letterhead-preview" id="letterhead-preview" style="display: none;">
+    <h3>Letterhead Preview</h3>
+    <iframe 
+      id="letterhead-iframe" 
+      style="width: 100%; height: 400px; border: 1px solid #ccc;" 
+      src="" 
+      frameborder="0">
+    </iframe>
+    <button class="sign-btn" onclick="signDocument()">Sign Document</button>
+  </div>
+  
   <script src="config.js"></script>
 
   <script>
