@@ -88,21 +88,32 @@ The Event Management Portal is a comprehensive web-based application designed to
 
 ## Folder Structure
 ```
-MindShifters
-├── backend
-│   ├── controllers
-│   ├── middleware
-│   ├── models
-│   ├── routes
-│   ├── server.js
-│   └── utils
-├── frontend
-│   ├── css
-│   ├── js
-│   └── html
-├── .env
-├── package.json
-└── README.md
+Mindshifters/
+├── backend/
+│   ├── db/
+│   ├── middleware/
+│   ├── routes/
+│   ├── .env
+│   ├── config.js
+│   ├── index.js
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vercel.json
+│   └── .gitignore
+├── frontend/
+│   ├── admin/
+│   ├── organiser/
+│   ├── participant/
+│   ├── config.js
+│   ├── pro.jpg
+│   ├── sign-in.html
+│   ├── signup.html
+│   └── vercel.json
+├── .vercel/
+├── .vscode/
+├── .gitignore
+├── README.md
+└── package.json
 ```
 
 ---
