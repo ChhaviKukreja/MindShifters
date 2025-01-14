@@ -276,36 +276,33 @@
   <script src="config.js"></script>
 
   <script>
-    // JavaScript Code
     document.addEventListener("DOMContentLoaded", () => {
       checkAuth();
       fetchEventCounts();
       fetchPendingEvents();
     });
-
-    // Check Authentication
+  
     async function checkAuth() {
       try {
         const token = localStorage.getItem("authToken");
-        console.log("here is token", token);
         if (!token) throw new Error("No token found");
-
+  
         const response = await fetch(`${API_BASE_URL}/admin/auth/check`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         if (!response.ok) {
           throw new Error("Authentication failed");
         }
       } catch (err) {
+        console.error("Authentication Error:", err);
         alert("You are not logged in. Redirecting to login page.");
         window.location.href = "sign-in.html";
       }
     }
-
-    // Fetch pending events from the backend
+  
     async function fetchPendingEvents() {
       try {
         const token = localStorage.getItem("authToken");
@@ -316,53 +313,50 @@
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         if (!response.ok) throw new Error("Failed to fetch pending requests");
-
+  
         const events = await response.json();
-        console.log("here", events);
         const tableBody = document.getElementById("pending-events-table");
         tableBody.innerHTML = "";
-
-        if (events.length === 0) {
+  
+        if (!events || events.length === 0) {
           tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;"><b>No pending requests found</b></td></tr>`;
           return;
         }
-
-        // Populate table with event data
+  
         events.forEach((event, index) => {
-          const studentCoords = event.stuCoord.map(coord => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`).join('<br>');
-
+          const studentCoords =
+            event.stuCoord?.map(
+              (coord) =>
+                `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`
+            ).join("<br>") || "No coordinators assigned";
+  
           const row = `
-              <tr id="event-row-${event._id}">
-                <td>${index + 1}</td>
-                <td>${event.event}</td>
-                <td>${event.location}</td>
-                <td>${new Date(event.date).toLocaleDateString()}</td>
-                <td>${event.time}</td>
-                <td>
-                  <div class="action-buttons">
-                  <button class="btn btn-view" onclick="viewLetterhead(${event._id})">View Letterhead</button>
-                  <button class="btn btn-approve" onclick="approveEvent(${event._id})">Approve</button>
-                  </div>       
-                </td>
-                <td>${event.stuCoord
-              .map((coord) => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`)
-              .join("<br>")}
-                </td>
-              </tr>
-            `;
+            <tr id="event-row-${event._id}">
+              <td>${index + 1}</td>
+              <td>${event.event}</td>
+              <td>${event.location}</td>
+              <td>${new Date(event.date).toLocaleDateString()}</td>
+              <td>${event.time}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-view" onclick="viewLetterhead('${event._id}')">View Letterhead</button>
+                  <button class="btn btn-approve" onclick="approveEvent('${event._id}')">Approve</button>
+                </div>
+              </td>
+              <td>${studentCoords}</td>
+            </tr>
+          `;
           tableBody.insertAdjacentHTML("beforeend", row);
         });
       } catch (error) {
         console.error("Error fetching pending events:", error);
-        alert("Error fetching pending events");
+        alert("Error fetching pending events.");
       }
     }
-
-    // Approve an event
+  
     async function approveEvent(eventId) {
-      console.log("yooooooo", eventId);
       try {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_BASE_URL}/admin/approve/${eventId}`, {
@@ -372,21 +366,18 @@
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response);
-
+  
         if (!response.ok) throw new Error("Failed to approve event");
-
-        const eventRow = document.getElementById(`event-row-${eventId}`);
-        eventRow.remove();
-
-        alert("Event approved successfully");
+  
+        document.getElementById(`event-row-${eventId}`).remove();
+        alert("Event approved successfully.");
         fetchPendingEvents(); // Refresh the table
       } catch (error) {
-        console.error(error);
-        alert("Error approving event");
+        console.error("Error approving event:", error);
+        alert("Error approving event.");
       }
     }
-
+  
     async function fetchEventCounts() {
       try {
         const token = localStorage.getItem("authToken");
@@ -395,25 +386,23 @@
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         if (!response.ok) throw new Error("Failed to fetch event counts");
-
+  
         const { pendingCount } = await response.json();
-
-        // Update the card content dynamically
         document.getElementById("pending-count").textContent = pendingCount;
       } catch (error) {
         console.error("Error fetching event counts:", error);
       }
     }
-
-    // Logout function
+  
     function logout() {
       localStorage.removeItem("authToken");
       alert("You have been logged out.");
-      window.location.href = "../sign-in.html";
+      window.location.href = "sign-in.html";
     }
   </script>
+  
 </body>
 
 </html>
