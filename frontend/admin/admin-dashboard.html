@@ -371,7 +371,7 @@
   
         document.getElementById(`event-row-${eventId}`).remove();
         alert("Event approved successfully.");
-        fetchPendingEvents(); // Refresh the table
+        location.reload();
       } catch (error) {
         console.error("Error approving event:", error);
         alert("Error approving event.");
