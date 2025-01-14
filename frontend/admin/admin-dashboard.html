@@ -261,10 +261,6 @@
         </thead>
         <tbody id="pending-events-table">
           <!-- Rows will be dynamically populated by JavaScript -->
-          <div class="action-buttons">
-            <button class="btn btn-view">View Letterhead</button>
-            <button class="btn btn-approve">Approve</button>
-          </div>
         </tbody>
       </table>
     </section>
@@ -345,7 +341,10 @@
                 <td>${new Date(event.date).toLocaleDateString()}</td>
                 <td>${event.time}</td>
                 <td>
-                  <button class="btn btn-primary" onclick="approveEvent('${event._id}')">Approve</button>
+                  <div class="action-buttons">
+                  <button class="btn btn-view" onclick="viewLetterhead(${event.id})">View Letterhead</button>
+                  <button class="btn btn-approve" onclick="approveEvent(${event.id})">Approve</button>
+                  </div>       
                 </td>
                 <td>${event.stuCoord
               .map((coord) => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`)
