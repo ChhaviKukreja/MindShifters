@@ -8,7 +8,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Playfair+Display:wght@400;700&display=swap"
+    rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -260,22 +261,22 @@
         </thead>
         <tbody id="pending-events-table">
           <!-- Rows will be dynamically populated by JavaScript -->
+          <div class="action-buttons">
+            <button class="btn btn-view">View Letterhead</button>
+            <button class="btn btn-approve">Approve</button>
+          </div>
         </tbody>
       </table>
     </section>
   </div>
 
-  <div class="letterhead-preview" id="letterhead-preview" style="display: none;">
+  <!-- <div class="letterhead-preview" id="letterhead-preview" style="display: none;">
     <h3>Letterhead Preview</h3>
-    <iframe 
-      id="letterhead-iframe" 
-      style="width: 100%; height: 400px; border: 1px solid #ccc;" 
-      src="" 
-      frameborder="0">
+    <iframe id="letterhead-iframe" style="width: 100%; height: 400px; border: 1px solid #ccc;" src="" frameborder="0">
     </iframe>
     <button class="sign-btn" onclick="signDocument()">Sign Document</button>
-  </div>
-  
+  </div> -->
+
   <script src="config.js"></script>
 
   <script>
@@ -285,12 +286,12 @@
       fetchEventCounts();
       fetchPendingEvents();
     });
-  
+
     // Check Authentication
     async function checkAuth() {
       try {
         const token = localStorage.getItem("authToken");
-        console.log("here is token",token);
+        console.log("here is token", token);
         if (!token) throw new Error("No token found");
 
         const response = await fetch(`${API_BASE_URL}/admin/auth/check`, {
@@ -314,23 +315,24 @@
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_BASE_URL}/admin/pending-requests`, {
           method: "GET",
-          headers: { "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         if (!response.ok) throw new Error("Failed to fetch pending requests");
-  
+
         const events = await response.json();
         console.log("here", events);
         const tableBody = document.getElementById("pending-events-table");
         tableBody.innerHTML = "";
 
-        if (events.length === 0 ) {
-        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;"><b>No pending requests found</b></td></tr>`;
-        return;
-      }
-  
+        if (events.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;"><b>No pending requests found</b></td></tr>`;
+          return;
+        }
+
         // Populate table with event data
         events.forEach((event, index) => {
           const studentCoords = event.stuCoord.map(coord => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`).join('<br>');
@@ -346,19 +348,19 @@
                   <button class="btn btn-primary" onclick="approveEvent('${event._id}')">Approve</button>
                 </td>
                 <td>${event.stuCoord
-                .map((coord) => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`)
-                .join("<br>")}
+              .map((coord) => `${coord.name} (Contact: ${coord.contact}, Email: ${coord.email})`)
+              .join("<br>")}
                 </td>
               </tr>
             `;
           tableBody.insertAdjacentHTML("beforeend", row);
         });
       } catch (error) {
-        console.error("Error fetching pending events:",error);
+        console.error("Error fetching pending events:", error);
         alert("Error fetching pending events");
       }
     }
-  
+
     // Approve an event
     async function approveEvent(eventId) {
       console.log("yooooooo", eventId);
@@ -367,17 +369,17 @@
         const response = await fetch(`${API_BASE_URL}/admin/approve/${eventId}`, {
           method: "POST",
           headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(response);
-  
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(response);
+
         if (!response.ok) throw new Error("Failed to approve event");
 
         const eventRow = document.getElementById(`event-row-${eventId}`);
         eventRow.remove();
-  
+
         alert("Event approved successfully");
         fetchPendingEvents(); // Refresh the table
       } catch (error) {
@@ -387,25 +389,25 @@
     }
 
     async function fetchEventCounts() {
-  try {
-    const token = localStorage.getItem("authToken");
-    const response = await fetch(`${API_BASE_URL}/admin/event-counts`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(`${API_BASE_URL}/admin/event-counts`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-    if (!response.ok) throw new Error("Failed to fetch event counts");
+        if (!response.ok) throw new Error("Failed to fetch event counts");
 
-    const { pendingCount } = await response.json();
+        const { pendingCount } = await response.json();
 
-    // Update the card content dynamically
-    document.getElementById("pending-count").textContent = pendingCount;
-  } catch (error) {
-    console.error("Error fetching event counts:", error);
-  }
-}
-  
+        // Update the card content dynamically
+        document.getElementById("pending-count").textContent = pendingCount;
+      } catch (error) {
+        console.error("Error fetching event counts:", error);
+      }
+    }
+
     // Logout function
     function logout() {
       localStorage.removeItem("authToken");
